@@ -477,7 +477,11 @@ namespace MiniBlinkPinvoke
                 }
             }
         }
-
+        [JSFunctin]
+        public void Console_WriteLine(string msg)
+        {
+            Console.WriteLine("控制台输出：" + msg);
+        }
     }
     public class JSFunctin : Attribute
     {

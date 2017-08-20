@@ -23,7 +23,7 @@ namespace MiniBlinkPinvoke
             //    EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");E
             //   EwePInvoke.wkeLoadW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             // EwePInvoke.wkeLoadURL(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
-            EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
+            EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///F:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -32,10 +32,6 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.body.innerHTML").ToString());
         }
 
-        [JSFunctin]
-        public void Console_WriteLine(string msg)
-        {
-            Console.WriteLine("控制台输出：" + msg);
-        }
+
     }
 }
