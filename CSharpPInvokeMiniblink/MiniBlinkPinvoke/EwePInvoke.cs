@@ -660,6 +660,8 @@ namespace MiniBlinkPinvoke
         [DllImport("node.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeLoadURLW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
         [DllImport("node.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeLoadFileW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
+        [DllImport("node.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeLoadW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
         [DllImport("node.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeMalloc(int size);

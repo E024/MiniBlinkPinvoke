@@ -13,7 +13,6 @@ namespace MiniBlinkPinvoke
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MiniBlinkPinvoke.EwePInvoke.ResourceAssemblys.Add("WebUI", System.Reflection.Assembly.GetExecutingAssembly());
             Application.Run(new Form1());

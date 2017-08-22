@@ -20,16 +20,20 @@ namespace MiniBlinkPinvoke
         private void button1_Click(object sender, EventArgs e)
         {
             //blinkBrowser1.handle
-            //    EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");E
+              EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
             //   EwePInvoke.wkeLoadW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             // EwePInvoke.wkeLoadURL(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
-            EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///F:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
+            //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///E:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
+            //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             //MessageBox.Show(EwePInvoke.wkeGetVersionString());
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.body.innerHTML").ToString());
+            //EwePInvoke.wkeLoadURL(blinkBrowser1.handle, Marshal.StringToHGlobalUni("file:///MiniBlinkPinvoke/index.html"));
+           EwePInvoke.wkeLoadFileW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
+
         }
 
 
