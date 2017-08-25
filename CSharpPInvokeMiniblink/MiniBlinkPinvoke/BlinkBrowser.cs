@@ -22,10 +22,10 @@ namespace MiniBlinkPinvoke
         Size oldSize;
         public object GlobalObjectJs = new object();
 
-        static wkeDocumentReadyCallback wkeDocumentReadyCallback;
         //public event wkeDocumentReadyCallback DocumentReadyCallback;
 
         static UrlChangedCallback urlChangedCallback;
+        static AlertBoxCallback AlertBoxCallback;
         public BlinkBrowser()
         {
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -37,7 +37,8 @@ namespace MiniBlinkPinvoke
             Console.WriteLine(url);
         }
 
-
+        static wkeDocumentReadyCallback wkeDocumentReadyCallback;
+        jsNativeFunction jsnav;
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
@@ -45,24 +46,39 @@ namespace MiniBlinkPinvoke
             {
                 timer.Tick += Timer_Tick;
                 timer.Start();
-                EwePInvoke.wkeInitialize();
-                handle = EwePInvoke.wkeCreateWebView();
-                EwePInvoke.wkeResize(handle, Width, Height);
-                BindJsFunc();
+                BlinkBrowserPInvoke.wkeInitialize();
+                handle = BlinkBrowserPInvoke.wkeCreateWebView();
+                BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
+                //BindJsFunc();
+                AlertBoxCallback = new AlertBoxCallback((a, b) =>
+                {
+                    MessageBox.Show(Marshal.PtrToStringAuto(b), "alert 调用");
+                });
+                BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
+                //IntPtr param = IntPtr.Zero;
                 //wkeDocumentReadyCallback = new wkeDocumentReadyCallback(OnDocumentReadyCallback);
-                //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback);
+                //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback, handle);
 
                 //urlChangedCallback = new UrlChangedCallback(OnUrlChangedCallback);
                 //EwePInvoke.wkeOnURLChanged(handle, urlChangedCallback);
 
                 //EwePInvoke.wkeSetUserAgentW(handle, "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+                //wkeDocumentReadyCallback = new wkeDocumentReadyCallback(OnDocumentReadyCallback);
+                //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback);
+                jsnav = new jsNativeFunction((es) =>
+               {
+                   var paramnow = BlinkBrowserPInvoke.jsArg(es, 1);
+                   Console_WriteLine(Marshal.PtrToStringAuto(BlinkBrowserPInvoke.jsToString(es, paramnow)));
+                   return paramnow;
+               });
+                BlinkBrowserPInvoke.jsBindFunction("Console_WriteLine", jsnav, 1);
 
             }
         }
-        void OnDocumentReadyCallback(IntPtr webView, ref wkeDocumentReadyInfo info)
+        void OnDocumentReadyCallback(IntPtr webView, IntPtr param)
         {
-            Console.WriteLine(info.url);
+            //Console.WriteLine(info.url);
             //DocumentReadyEventArgs e = new DocumentReadyEventArgs
             //{
             //    Url = Marshal.PtrToStringUni(info.url),
@@ -88,7 +104,7 @@ namespace MiniBlinkPinvoke
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (handle != IntPtr.Zero && EwePInvoke.wkeIsDirty(handle))
+            if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             {
                 Invalidate();
             }
@@ -109,7 +125,7 @@ namespace MiniBlinkPinvoke
                     bits = Marshal.AllocHGlobal(Width * Height * 4);
                 }
 
-                EwePInvoke.wkePaint(handle, bits, 0);
+                BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
                 using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
                 {
                     e.Graphics.DrawImage(bmp, 0, 0);
@@ -128,7 +144,7 @@ namespace MiniBlinkPinvoke
         }
         void SetCursors()
         {
-            switch (EwePInvoke.wkeGetCursorInfoType(handle))
+            switch (BlinkBrowserPInvoke.wkeGetCursorInfoType(handle))
             {
                 case WkeCursorInfo.WkeCursorInfoPointer:
                     Cursor = Cursors.Default;
@@ -199,7 +215,7 @@ namespace MiniBlinkPinvoke
             base.OnSizeChanged(e);
             if (handle != IntPtr.Zero)
             {
-                EwePInvoke.wkeResize(handle, Width, Height);
+                BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 Invalidate();
             }
         }
@@ -212,7 +228,7 @@ namespace MiniBlinkPinvoke
                 if (handle != IntPtr.Zero)
                 {
                     uint flags = GetMouseFlags(e);
-                    EwePInvoke.wkeFireMouseWheelEvent(handle, e.X, e.Y, e.Delta, flags);
+                    BlinkBrowserPInvoke.wkeFireMouseWheelEvent(handle, e.X, e.Y, e.Delta, flags);
                 }
             }
         }
@@ -237,7 +253,7 @@ namespace MiniBlinkPinvoke
                 uint flags = GetMouseFlags(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
+                    BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
                 }
             }
         }
@@ -262,7 +278,7 @@ namespace MiniBlinkPinvoke
                 uint flags = GetMouseFlags(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
+                    BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
                     //if (e.Button == MouseButtons.Right)
                     //{
                     //    EwePInvoke.wkeFireContextMenuEvent(handle, e.X, e.Y, flags);
@@ -286,7 +302,7 @@ namespace MiniBlinkPinvoke
                 if (this.handle != IntPtr.Zero)
                 {
                     uint flags = GetMouseFlags(e);
-                    EwePInvoke.wkeFireMouseEvent(this.handle, 0x200, e.X, e.Y, flags);
+                    BlinkBrowserPInvoke.wkeFireMouseEvent(this.handle, 0x200, e.X, e.Y, flags);
                 }
             }
         }
@@ -297,7 +313,7 @@ namespace MiniBlinkPinvoke
                 base.OnKeyDown(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeFireKeyDownEvent(handle, (uint)e.KeyValue, 0, false);
+                    BlinkBrowserPInvoke.wkeFireKeyDownEvent(handle, (uint)e.KeyValue, 0, false);
                 }
             }
         }
@@ -309,7 +325,7 @@ namespace MiniBlinkPinvoke
                 if (handle != IntPtr.Zero)
                 {
                     e.Handled = true;
-                    EwePInvoke.wkeFireKeyPressEvent(handle, (uint)e.KeyChar, 0, false);
+                    BlinkBrowserPInvoke.wkeFireKeyPressEvent(handle, (uint)e.KeyChar, 0, false);
                 }
             }
         }
@@ -320,7 +336,7 @@ namespace MiniBlinkPinvoke
                 base.OnKeyUp(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeFireKeyUpEvent(handle, (uint)e.KeyValue, 0, false);
+                    BlinkBrowserPInvoke.wkeFireKeyUpEvent(handle, (uint)e.KeyValue, 0, false);
                 }
             }
         }
@@ -332,7 +348,7 @@ namespace MiniBlinkPinvoke
                 base.OnGotFocus(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeSetFocus(handle);
+                    BlinkBrowserPInvoke.wkeSetFocus(handle);
                 }
             }
         }
@@ -344,7 +360,7 @@ namespace MiniBlinkPinvoke
                 base.OnLostFocus(e);
                 if (handle != IntPtr.Zero)
                 {
-                    EwePInvoke.wkeKillFocus(handle);
+                    BlinkBrowserPInvoke.wkeKillFocus(handle);
                 }
             }
         }
@@ -392,14 +408,14 @@ namespace MiniBlinkPinvoke
         public JsValue InvokeJS(string js)
         {
 
-            return new JsValue(EwePInvoke.wkeRunJS(handle, Marshal.StringToBSTR(js)), EwePInvoke.wkeGlobalExec(handle));
+            return new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, Marshal.StringToBSTR(js)), BlinkBrowserPInvoke.wkeGlobalExec(handle));
             //Marshal.SecureStringToGlobalAllocAnsi(js)
             //return new JsValue(EwePInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), EwePInvoke.wkeGlobalExec(handle));
         }
         public JsValue InvokeJSW(string js)
         {
             //var value = EwePInvoke.wkeRunJSW(handle, js);
-           return new JsValue(EwePInvoke.wkeRunJSW(handle, js), EwePInvoke.wkeGlobalExec(handle));
+            return new JsValue(BlinkBrowserPInvoke.wkeRunJSW(handle, js), BlinkBrowserPInvoke.wkeGlobalExec(handle));
             //return Marshal.PtrToStringUni(EwePInvoke.jsToString(EwePInvoke.wkeGlobalExec(handle), xc));
             //return new JsValue(xc, EwePInvoke.wkeGlobalExec(handle)).ToString();
             //return Marshal.PtrToStringAnsi(xc);
@@ -418,42 +434,42 @@ namespace MiniBlinkPinvoke
                 var xx = item.GetCustomAttributes(typeof(JSFunctin), true);
                 if (xx != null && xx.Length != 0)
                 {
-                    var jsnav = new jsNativeFunction((es, jsObject, args, argCount) =>
+                    var jsnav = new jsNativeFunction((es) =>
                     {
                         var xp = item.GetParameters();
-                        var argcount = EwePInvoke.jsArgCount(es);
+                        var argcount = BlinkBrowserPInvoke.jsArgCount(es);
                         if (xp != null && xp.Length != 0 && argcount != 0)
                         {
 
-                            object[] listParam = new object[EwePInvoke.jsArgCount(es)];
+                            object[] listParam = new object[BlinkBrowserPInvoke.jsArgCount(es)];
                             for (int i = 0; i < argcount; i++)
                             {
                                 Type tType = xp[i].ParameterType;
 
-                                var paramnow = EwePInvoke.jsArg(es, i);
+                                var paramnow = BlinkBrowserPInvoke.jsArg(es, i);
 
                                 if (tType == typeof(int))
                                 {
-                                    listParam[i] = Convert.ChangeType(EwePInvoke.jsToInt(es, paramnow), tType);
+                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToInt(es, paramnow), tType);
                                 }
                                 else
                                 if (tType == typeof(double))
                                 {
-                                    listParam[i] = Convert.ChangeType(EwePInvoke.jsToDouble(es, paramnow), tType);
+                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToDouble(es, paramnow), tType);
                                 }
                                 else
                                 if (tType == typeof(float))
                                 {
-                                    listParam[i] = Convert.ChangeType(EwePInvoke.jsToFloat(es, paramnow), tType);
+                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToFloat(es, paramnow), tType);
                                 }
                                 else
                                 if (tType == typeof(bool))
                                 {
-                                    listParam[i] = Convert.ChangeType(EwePInvoke.jsToBoolean(es, paramnow), tType);
+                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToBoolean(es, paramnow), tType);
                                 }
                                 else
                                 {
-                                    listParam[i] = Convert.ChangeType(Marshal.PtrToStringUni(EwePInvoke.jsToString(es, paramnow)), tType);
+                                    listParam[i] = Convert.ChangeType(Marshal.PtrToStringUni(BlinkBrowserPInvoke.jsToString(es, paramnow)), tType);
                                 }
 
                             }
@@ -472,7 +488,7 @@ namespace MiniBlinkPinvoke
                         }
                         return 0L;
                     });
-                    EwePInvoke.jsBindFunction( item.Name, jsnav);
+                    BlinkBrowserPInvoke.jsBindFunction(item.Name, jsnav, (uint)item.GetParameters().Length);
                     jsnaviteList.Add(jsnav);
                 }
             }
@@ -480,7 +496,7 @@ namespace MiniBlinkPinvoke
         [JSFunctin]
         public void Console_WriteLine(string msg)
         {
-            Console.WriteLine("控制台输出：" + msg);
+            MessageBox.Show("Console_WriteLine 方法被调用了：" + msg);
         }
     }
     public class JSFunctin : Attribute
