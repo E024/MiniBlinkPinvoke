@@ -276,8 +276,10 @@ namespace MiniBlinkPinvoke
         private static OnDidDownloadCallback didDownloadCallback_2;
         private static OnDidDownloadCallback didDownloadCallback_1;
         private static OnDidDownloadCallback didDownloadCallback_0;
-
-
+        public delegate long JsCallCallback(IntPtr es);
+        public delegate void UrlChangedCallback(IntPtr webView, IntPtr url);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate long jsNativeFunction(IntPtr es);
         static BlinkBrowserPInvoke()
         {
             //if (System.IO.File.Exists(BlinkBrowserdll))
@@ -744,10 +746,6 @@ namespace MiniBlinkPinvoke
         WKE_CONTROL = 0x08,
         WKE_MBUTTON = 0x10,
     }
-    public delegate long JsCallCallback(IntPtr es);
-    public delegate void UrlChangedCallback(IntPtr webView, IntPtr url);
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate long jsNativeFunction(IntPtr es);
 
     public enum wkeJSType
     {
