@@ -70,8 +70,9 @@ namespace MiniBlinkPinvoke
                    var paramnow = BlinkBrowserPInvoke.jsArg(es, 1);
                    Console_WriteLine(Marshal.PtrToStringAnsi(BlinkBrowserPInvoke.jsToString(es, paramnow)));
                    return paramnow;
-               });
-                BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 2);
+               });              
+                //BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 2);
+              BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 2);
 
             }
         }  private void Timer_Tick(object sender, EventArgs e)
@@ -396,75 +397,75 @@ namespace MiniBlinkPinvoke
 
 
         private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
-        public void BindJsFunc()
-        {
-            var att = GlobalObjectJs.GetType().GetMethods();
-            jsnaviteList.Clear();
-            var result = new ArrayList();
-            foreach (var item in att)
-            {
-                var xx = item.GetCustomAttributes(typeof(JSFunctin), true);
-                if (xx != null && xx.Length != 0)
-                {
-                    var jsnav = new jsNativeFunction((es) =>
-                    {
-                        var xp = item.GetParameters();
-                        var argcount = BlinkBrowserPInvoke.jsArgCount(es);
-                        if (xp != null && xp.Length != 0 && argcount != 0)
-                        {
+        //public void BindJsFunc()
+        //{
+        //    var att = GlobalObjectJs.GetType().GetMethods();
+        //    jsnaviteList.Clear();
+        //    var result = new ArrayList();
+        //    foreach (var item in att)
+        //    {
+        //        var xx = item.GetCustomAttributes(typeof(JSFunctin), true);
+        //        if (xx != null && xx.Length != 0)
+        //        {
+        //            var jsnav = new jsNativeFunction((es) =>
+        //            {
+        //                var xp = item.GetParameters();
+        //                var argcount = BlinkBrowserPInvoke.jsArgCount(es);
+        //                if (xp != null && xp.Length != 0 && argcount != 0)
+        //                {
 
-                            object[] listParam = new object[BlinkBrowserPInvoke.jsArgCount(es)];
-                            for (int i = 0; i < argcount; i++)
-                            {
-                                Type tType = xp[i].ParameterType;
+        //                    object[] listParam = new object[BlinkBrowserPInvoke.jsArgCount(es)];
+        //                    for (int i = 0; i < argcount; i++)
+        //                    {
+        //                        Type tType = xp[i].ParameterType;
 
-                                var paramnow = BlinkBrowserPInvoke.jsArg(es, i);
+        //                        var paramnow = BlinkBrowserPInvoke.jsArg(es, i);
 
-                                if (tType == typeof(int))
-                                {
-                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToInt(es, paramnow), tType);
-                                }
-                                else
-                                if (tType == typeof(double))
-                                {
-                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToDouble(es, paramnow), tType);
-                                }
-                                else
-                                if (tType == typeof(float))
-                                {
-                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToFloat(es, paramnow), tType);
-                                }
-                                else
-                                if (tType == typeof(bool))
-                                {
-                                    listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToBoolean(es, paramnow), tType);
-                                }
-                                else
-                                {
-                                    listParam[i] = Convert.ChangeType(Marshal.PtrToStringUni(BlinkBrowserPInvoke.jsToString(es, paramnow)), tType);
-                                }
+        //                        if (tType == typeof(int))
+        //                        {
+        //                            listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToInt(es, paramnow), tType);
+        //                        }
+        //                        else
+        //                        if (tType == typeof(double))
+        //                        {
+        //                            listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToDouble(es, paramnow), tType);
+        //                        }
+        //                        else
+        //                        if (tType == typeof(float))
+        //                        {
+        //                            listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToFloat(es, paramnow), tType);
+        //                        }
+        //                        else
+        //                        if (tType == typeof(bool))
+        //                        {
+        //                            listParam[i] = Convert.ChangeType(BlinkBrowserPInvoke.jsToBoolean(es, paramnow), tType);
+        //                        }
+        //                        else
+        //                        {
+        //                            listParam[i] = Convert.ChangeType(Marshal.PtrToStringUni(BlinkBrowserPInvoke.jsToString(es, paramnow)), tType);
+        //                        }
 
-                            }
+        //                    }
 
-                            try
-                            {
-                                item.Invoke(GlobalObjectJs, listParam);
-                            }
-                            catch (Exception)
-                            {
-                            }
-                        }
-                        else
-                        {
-                            item.Invoke(GlobalObjectJs, null);
-                        }
-                        return 0L;
-                    });
-                    BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi(item.Name), jsnav, (uint)item.GetParameters().Length);
-                    jsnaviteList.Add(jsnav);
-                }
-            }
-        }
+        //                    try
+        //                    {
+        //                        item.Invoke(GlobalObjectJs, listParam);
+        //                    }
+        //                    catch (Exception)
+        //                    {
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    item.Invoke(GlobalObjectJs, null);
+        //                }
+        //                return 0L;
+        //            });
+        //            BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi(item.Name), jsnav, (uint)item.GetParameters().Length);
+        //            jsnaviteList.Add(jsnav);
+        //        }
+        //    }
+        //}
         [JSFunctin]
         public void Console_WriteLine(string msg)
         {
