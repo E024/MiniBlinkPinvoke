@@ -58,54 +58,23 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
                 //IntPtr param = IntPtr.Zero;
-                //wkeDocumentReadyCallback = new wkeDocumentReadyCallback(OnDocumentReadyCallback);
-                //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback, handle);
 
                 //urlChangedCallback = new UrlChangedCallback(OnUrlChangedCallback);
                 //EwePInvoke.wkeOnURLChanged(handle, urlChangedCallback);
 
                 //EwePInvoke.wkeSetUserAgentW(handle, "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
-                //wkeDocumentReadyCallback = new wkeDocumentReadyCallback(OnDocumentReadyCallback);
-                //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback);
                 jsnav = new jsNativeFunction((es) =>
                {
-                   var count = BlinkBrowserPInvoke.jsArgCount(es);
+                   var count = BlinkBrowserPInvoke.jsArgCount(es);//返回0？？？
                    MessageBox.Show(count.ToString());
                    var paramnow = BlinkBrowserPInvoke.jsArg(es, 1);
                    Console_WriteLine(Marshal.PtrToStringAnsi(BlinkBrowserPInvoke.jsToString(es, paramnow)));
                    return paramnow;
                });
-                BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 1);
+                BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 2);
 
             }
-        }
-        void OnDocumentReadyCallback(IntPtr webView, IntPtr param)
-        {
-            //Console.WriteLine(info.url);
-            //DocumentReadyEventArgs e = new DocumentReadyEventArgs
-            //{
-            //    Url = Marshal.PtrToStringUni(info.url),
-            //    FrameJSState = info.frameJSState,
-            //    MainFrameJSState = info.mainFrameJSState
-            //};
-            //if (e.FrameObject != null)
-            //{
-            //    this.method_27(info.frameJSState, e.FrameObject);
-            //    if (e.FrameObject is WebUIPage)
-            //    {
-            //        (e.FrameObject as WebUIPage).OnLoad();
-            //    }
-            //}
-
-            //if (DocumentReadyCallback != null)
-            //{
-            //    DocumentReadyCallback(webView, ref info);
-            //    if (!string.IsNullOrEmpty(EwePInvoke.PageNameSpace) && (e.FrameJSState != e.MainFrameJSState))
-            //    {
-            //    }
-            //}
-        }
-        private void Timer_Tick(object sender, EventArgs e)
+        }  private void Timer_Tick(object sender, EventArgs e)
         {
             if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             {
