@@ -69,11 +69,13 @@ namespace MiniBlinkPinvoke
                 //EwePInvoke.wkeOnDocumentReady(handle, wkeDocumentReadyCallback);
                 jsnav = new jsNativeFunction((es) =>
                {
+                   var count = BlinkBrowserPInvoke.jsArgCount(es);
+                   MessageBox.Show(count.ToString());
                    var paramnow = BlinkBrowserPInvoke.jsArg(es, 1);
-                   Console_WriteLine(Marshal.PtrToStringAuto(BlinkBrowserPInvoke.jsToString(es, paramnow)));
+                   Console_WriteLine(Marshal.PtrToStringAnsi(BlinkBrowserPInvoke.jsToString(es, paramnow)));
                    return paramnow;
                });
-                BlinkBrowserPInvoke.jsBindFunction("Console_WriteLine", jsnav, 1);
+                BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 1);
 
             }
         }
@@ -489,7 +491,7 @@ namespace MiniBlinkPinvoke
                         }
                         return 0L;
                     });
-                    BlinkBrowserPInvoke.jsBindFunction(item.Name, jsnav, (uint)item.GetParameters().Length);
+                    BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi(item.Name), jsnav, (uint)item.GetParameters().Length);
                     jsnaviteList.Add(jsnav);
                 }
             }

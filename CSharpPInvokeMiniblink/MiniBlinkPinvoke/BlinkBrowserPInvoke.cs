@@ -278,7 +278,7 @@ namespace MiniBlinkPinvoke
         private static OnDidDownloadCallback didDownloadCallback_0;
         public delegate long JsCallCallback(IntPtr es);
         public delegate void UrlChangedCallback(IntPtr webView, IntPtr url);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate long jsNativeFunction(IntPtr es);
         static BlinkBrowserPInvoke()
         {
@@ -394,8 +394,24 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         // public static extern void wkeJSSimpleBind(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string name, jsNativeFunction fn);
-        public static extern void jsBindFunction([MarshalAs(UnmanagedType.LPWStr)] [In] string name, jsNativeFunction fn, uint argCount);
+        public static extern void jsBindFunction(IntPtr name, jsNativeFunction fn, uint argCount);
+        public static void jsBindFunction(out string drive, jsNativeFunction fn, uint argCount)
+        {
+            drive = null;
+            var ptr = Marshal.AllocHGlobal(10);
+            try
+            {
+                jsBindFunction(ptr, fn, argCount);
 
+                drive = Marshal.PtrToStringAnsi(ptr);
+
+                //return ret;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
+        }
 
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
