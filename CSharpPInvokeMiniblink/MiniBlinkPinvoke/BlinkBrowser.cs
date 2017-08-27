@@ -27,17 +27,21 @@ namespace MiniBlinkPinvoke
 
         static UrlChangedCallback urlChangedCallback;
         static AlertBoxCallback AlertBoxCallback;
+        static TitleChangedCallback titleChangeCallback;
         public BlinkBrowser()
         {
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             GlobalObjectJs = this;
         }
 
-        void OnUrlChangedCallback(IntPtr webView, IntPtr url)
+        void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
-            Console.WriteLine(url);
+            Console.WriteLine(Marshal.PtrToStringAuto(url));
         }
-
+        void OnTitleChangeCallback(IntPtr webView, IntPtr param, IntPtr title)
+        {
+            //Console.WriteLine(Marshal.PtrToStringAnsi(title));
+        }
         static wkeDocumentReadyCallback wkeDocumentReadyCallback;
         jsNativeFunction jsnav;
         protected override void OnCreateControl()
@@ -60,7 +64,11 @@ namespace MiniBlinkPinvoke
                 //IntPtr param = IntPtr.Zero;
 
                 //urlChangedCallback = new UrlChangedCallback(OnUrlChangedCallback);
-                //EwePInvoke.wkeOnURLChanged(handle, urlChangedCallback);
+                //BlinkBrowserPInvoke.wkeOnURLChanged(handle, urlChangedCallback,IntPtr.Zero);
+
+
+                //titleChangeCallback = new TitleChangedCallback(OnTitleChangeCallback);
+                //BlinkBrowserPInvoke.wkeOnTitleChanged(handle, titleChangeCallback, this.Handle);
 
                 //EwePInvoke.wkeSetUserAgentW(handle, "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
                 jsnav = new jsNativeFunction((es) =>
@@ -70,12 +78,13 @@ namespace MiniBlinkPinvoke
                    var paramnow = BlinkBrowserPInvoke.jsArg(es, 1);
                    Console_WriteLine(Marshal.PtrToStringAnsi(BlinkBrowserPInvoke.jsToString(es, paramnow)));
                    return paramnow;
-               });              
-                //BlinkBrowserPInvoke.jsBindFunction(Marshal.StringToCoTaskMemAnsi("Console_WriteLine"), jsnav, 2);
-              BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 2);
+               });
+                BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 1);
+                // BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 2);
 
             }
-        }  private void Timer_Tick(object sender, EventArgs e)
+        }
+        private void Timer_Tick(object sender, EventArgs e)
         {
             if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             {
@@ -381,7 +390,7 @@ namespace MiniBlinkPinvoke
         public JsValue InvokeJS(string js)
         {
 
-            return new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, Marshal.StringToBSTR(js)), BlinkBrowserPInvoke.wkeGlobalExec(handle));
+            return new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), BlinkBrowserPInvoke.wkeGlobalExec(handle));
             //Marshal.SecureStringToGlobalAllocAnsi(js)
             //return new JsValue(EwePInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), EwePInvoke.wkeGlobalExec(handle));
         }

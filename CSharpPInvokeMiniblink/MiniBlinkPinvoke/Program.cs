@@ -15,7 +15,7 @@ namespace MiniBlinkPinvoke
         {
             
             Application.SetCompatibleTextRenderingDefault(false);
-            MiniBlinkPinvoke.BlinkBrowserPInvoke.ResourceAssemblys.Add("WebUI", System.Reflection.Assembly.GetExecutingAssembly());
+            MiniBlinkPinvoke.BlinkBrowserPInvoke.ResourceAssemblys.Add("MiniBlinkPinvoke", System.Reflection.Assembly.GetExecutingAssembly());
             Application.Run(new Form1());
         }
     }
