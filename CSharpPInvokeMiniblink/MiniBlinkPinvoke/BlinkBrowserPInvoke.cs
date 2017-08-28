@@ -166,6 +166,7 @@ namespace MiniBlinkPinvoke
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void wkeConsoleMessageCallback(IntPtr webView, ref wkeConsoleMessage message);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate wkeNavigationAction wkeNavigationCallback(IntPtr webView, wkeNavigationType navigationType, IntPtr url);
 
@@ -181,9 +182,9 @@ namespace MiniBlinkPinvoke
     /// <param name="failedReason"></param>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool wkeDownloadFileCallback(IntPtr webView, IntPtr url, IntPtr mimeType);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void TitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title);
-
 
     public enum wkeNavigationAction
     {
@@ -266,12 +267,14 @@ namespace MiniBlinkPinvoke
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IntPtr wkeCreateViewCallback(IntPtr webView, IntPtr param, ref wkeNewViewInfo info);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnDidDownloadCallback([MarshalAs(UnmanagedType.LPWStr)] [In] string url, IntPtr data, uint size);
+
     /// <summary>
     /// 如需要更完善的功能，请根据Pinvoke封装规则把ewe.h里的API进行封装
     /// </summary>
-    public class BlinkBrowserPInvoke
+    public static class BlinkBrowserPInvoke
     {
         const string BlinkBrowserdll = "node.dll";
         private static ReadFileCallback readFileCallback;
@@ -279,12 +282,17 @@ namespace MiniBlinkPinvoke
         private static OnDidDownloadCallback didDownloadCallback_2;
         private static OnDidDownloadCallback didDownloadCallback_1;
         private static OnDidDownloadCallback didDownloadCallback_0;
-        public delegate long JsCallCallback(IntPtr es);
+        public delegate Int64 JsCallCallback(IntPtr es);
         public delegate void UrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url);
+        private static UnmanagedCodeSupplier callbackProvider;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate long jsNativeFunction(IntPtr es);
+        public delegate Int64 jsNativeFunction(IntPtr es);
+
+        //[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        //private delegate void PStdCallDelegateVersion(IntPtr context, IntPtr type, IntPtr arg1, IntPtr arg2);
         static BlinkBrowserPInvoke()
         {
+
             //if (System.IO.File.Exists(BlinkBrowserdll))
             //{
             //if (Environment.OSVersion.Version.Major >= 6)
@@ -301,7 +309,6 @@ namespace MiniBlinkPinvoke
             //wkeOnDidDownloadCallback(didDownloadCallback_0);
             //}
         }
-
 
         //DidDownloadCallback([In, MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr data, uint size);
         private static void DownloadCallback(string url, IntPtr data, uint size)
@@ -382,6 +389,7 @@ namespace MiniBlinkPinvoke
         //public static extern void wkeOnReadFile(ReadFileCallback _callback);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeBeforeSendCallback(BeforeSendCallback _callback);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeExecCommand(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string command, [In] [MarshalAs(UnmanagedType.LPWStr)] string args);
 
@@ -399,8 +407,6 @@ namespace MiniBlinkPinvoke
         // public static extern void wkeJSSimpleBind(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string name, jsNativeFunction fn);
         public static extern void jsBindFunction([MarshalAs(UnmanagedType.LPStr)] [In] string name, jsNativeFunction fn, uint argCount);
 
-
-
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern long wkeJSString(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -408,8 +414,10 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr jsToString(IntPtr es, long v);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern string jsToStringW(IntPtr es, long v);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern wkeJSData wkeJSGetData(IntPtr es, long jsValue);
 
@@ -425,12 +433,12 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern long wkeJSEval(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string js);
 
-
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetWTFString(IntPtr wtfstr);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkePaint(IntPtr webView, IntPtr bits, int pitch);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern WkeCursorInfo wkeGetCursorInfoType(IntPtr webView);
 
@@ -445,7 +453,6 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int jsArgCount(IntPtr wkeJSState);
-
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGlobalExec(IntPtr webView);
@@ -688,9 +695,9 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnPaintUpdated(IntPtr webView, wkePaintUpdatedCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeOnTitleChanged(IntPtr webView, TitleChangedCallback callback,IntPtr callbackParam);
+        public static extern void wkeOnTitleChanged(IntPtr webView, TitleChangedCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeOnURLChanged(IntPtr webView, UrlChangedCallback callback,IntPtr callbackParam);
+        public static extern void wkeOnURLChanged(IntPtr webView, UrlChangedCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkePostURL(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr data, int dataBytes);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -724,6 +731,21 @@ namespace MiniBlinkPinvoke
         public static extern string wkeGetVersionString();
 
 
+        public static string IntptrToString(this IntPtr ptr)
+        {
+            var data = new List<byte>();
+            var off = 0;
+            while (true)
+            {
+                var ch = Marshal.ReadByte(ptr, off++);
+                if (ch == 0)
+                {
+                    break;
+                }
+                data.Add(ch);
+            }
+            return Encoding.UTF8.GetString(data.ToArray());
+        }
 
     }
 
