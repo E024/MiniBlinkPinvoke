@@ -25,13 +25,26 @@ namespace MiniBlinkPinvoke
 
         //public event wkeDocumentReadyCallback DocumentReadyCallback;
 
-        static UrlChangedCallback urlChangedCallback;
+        //static UrlChangedCallback urlChangedCallback;
         static AlertBoxCallback AlertBoxCallback;
-        static TitleChangedCallback titleChangeCallback;
+        //static TitleChangedCallback titleChangeCallback;
+        static wkeNavigationCallback _wkeNavigationCallback;
         public BlinkBrowser()
         {
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             GlobalObjectJs = this;
+        }
+
+        bool OnwkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
+        {
+            
+            Console.WriteLine(navigationType);
+            Console.WriteLine(BlinkBrowserPInvoke.wkeGetString(url));
+            //Console.WriteLine(Marshal.PtrToStringAnsi(url));
+            //Console.WriteLine(Marshal.PtrToStringAuto(url));
+            //Console.WriteLine(Marshal.PtrToStringBSTR(url));
+            //Console.WriteLine(Marshal.PtrToStringUni(url));
+            return true;
         }
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
@@ -42,9 +55,7 @@ namespace MiniBlinkPinvoke
         {
             //Console.WriteLine(Marshal.PtrToStringAnsi(title));
         }
-        static wkeDocumentReadyCallback wkeDocumentReadyCallback;
-        private UnmanagedCodeSupplier callbackProvider;
-        jsNativeFunction jsnav;
+    
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
@@ -62,28 +73,9 @@ namespace MiniBlinkPinvoke
                 });
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
-                //IntPtr param = IntPtr.Zero;
-
-                //urlChangedCallback = new UrlChangedCallback(OnUrlChangedCallback);
-                //BlinkBrowserPInvoke.wkeOnURLChanged(handle, urlChangedCallback,IntPtr.Zero);
-
-
-                //titleChangeCallback = new TitleChangedCallback(OnTitleChangeCallback);
-                //BlinkBrowserPInvoke.wkeOnTitleChanged(handle, titleChangeCallback, this.Handle);
-
-                //EwePInvoke.wkeSetUserAgentW(handle, "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
-                //jsnav = new jsNativeFunction((es) =>
-                //{
-                //    var count = BlinkBrowserPInvoke.jsArgCount(es);//返回0？？？
-                //    MessageBox.Show(count.ToString());
-                //    var paramnow = BlinkBrowserPInvoke.jsArg(es, 0);
-                //    Console_WriteLine(Marshal.PtrToStringAnsi(jsToString(es, paramnow)));
-                //    return paramnow;
-                //});
-
-                //BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 1);
-                // BlinkBrowserPInvoke.jsBindFunction(("Console_WriteLine"), jsnav, 2);
-
+                _wkeNavigationCallback = OnwkeNavigationCallback;
+                //最后这个参数不知道干啥用的，接口声明那不加这个也能调用。
+                BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback,IntPtr.Zero);
             }
         }
         private void Timer_Tick(object sender, EventArgs e)
@@ -484,7 +476,7 @@ namespace MiniBlinkPinvoke
         [JSFunctin]
         public void Console_WriteLine2(int msg, string msg2)
         {
-            MessageBox.Show("Console_WriteLine w 方法被调用了：" + msg2+ " "+msg);
+            MessageBox.Show("Console_WriteLine w 方法被调用了：" + msg2 + " " + msg);
         }
 
 

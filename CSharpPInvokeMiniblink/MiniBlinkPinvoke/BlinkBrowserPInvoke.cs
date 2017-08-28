@@ -167,8 +167,6 @@ namespace MiniBlinkPinvoke
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void wkeConsoleMessageCallback(IntPtr webView, ref wkeConsoleMessage message);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate wkeNavigationAction wkeNavigationCallback(IntPtr webView, wkeNavigationType navigationType, IntPtr url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void wkeLoadingFinishCallback(IntPtr webView, IntPtr url, wkeLoadingResult result, IntPtr failedReason);
@@ -284,7 +282,9 @@ namespace MiniBlinkPinvoke
         private static OnDidDownloadCallback didDownloadCallback_0;
         public delegate Int64 JsCallCallback(IntPtr es);
         public delegate void UrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url);
-        private static UnmanagedCodeSupplier callbackProvider;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool wkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Int64 jsNativeFunction(IntPtr es);
 
@@ -382,6 +382,12 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnDidDownloadCallback(OnDidDownloadCallback _callback);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeGetStringW(IntPtr @string);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern string wkeGetString(IntPtr @string);
+        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern IntPtr wkeCreateStringW([In] [MarshalAs(UnmanagedType.LPWStr)] string @string,long len);
 
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         ////public static extern void wkeDisableWOFF([MarshalAs(UnmanagedType.I1)] bool isDisable);
@@ -397,8 +403,8 @@ namespace MiniBlinkPinvoke
         //public static extern IntPtr wkeGetUserAgent(IntPtr handle);
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern void wkeSetUserAgent(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeSetUserAgentW(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
+        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern void wkeSetUserAgentW(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
 
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern void wkeOnJsCall(IntPtr handle, JsCallCallback js);
@@ -577,9 +583,9 @@ namespace MiniBlinkPinvoke
         public static extern void wkeResize(IntPtr webView, int w, int h);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeGetCookie(IntPtr webView);
+        public static extern IntPtr wkeGetCookie(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr wkeGetCookieW(IntPtr webView);
+        public static extern string  wkeGetCookieW(IntPtr webView);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Utf8StringToWkeChar([In, MarshalAs(UnmanagedType.LPStr)] string param0);
@@ -689,7 +695,7 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnLoadingFinish(IntPtr webView, wkeLoadingFinishCallback callback);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeOnNavigation(IntPtr webView, wkeNavigationCallback callback);
+        public static extern void wkeOnNavigation(IntPtr webView, wkeNavigationCallback callback, IntPtr param);
 
         public delegate void wkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
