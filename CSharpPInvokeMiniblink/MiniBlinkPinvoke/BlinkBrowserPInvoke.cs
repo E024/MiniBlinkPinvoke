@@ -875,19 +875,7 @@ namespace MiniBlinkPinvoke
             {
                 return string.Empty;
             }
-            var data = new List<byte>();
-            var off = 0;
-            while (true)
-            {
-                var ch = Marshal.ReadByte(BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0), off++);
-                if (ch == 0)
-                {
-                    break;
-                }
-                data.Add(ch);
-            }
-            return Encoding.UTF8.GetString(data.ToArray());
-
+            return BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0).IntptrToString();
         }
 
         public wkeJSType JsType
