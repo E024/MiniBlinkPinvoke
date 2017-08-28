@@ -40,15 +40,20 @@ namespace MiniBlinkPinvoke
             //MessageBox.Show(blinkBrowser1.InvokeJS("return testInt()").ToFloat() + "");
 
             //Console.WriteLine(BlinkBrowserPInvoke.wkeCreateStringW("123", "123".Length).IntptrToString());
-            MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
-            MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookieW(blinkBrowser1.handle));
-            Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
+          MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookieW(blinkBrowser1.handle));
+            //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void blinkBrowser1_OnTitleChangeCall(IntPtr webView, IntPtr param, IntPtr title)
+        {
+            Text = BlinkBrowserPInvoke.wkeGetStringW(title);
         }
     }
 }

@@ -23,23 +23,43 @@ namespace MiniBlinkPinvoke
         Size oldSize;
         public object GlobalObjectJs = new object();
 
+
+        public event TitleChangedCallback OnTitleChangeCall;
+
         //public event wkeDocumentReadyCallback DocumentReadyCallback;
 
-        //static UrlChangedCallback urlChangedCallback;
+        static UrlChangedCallback urlChangedCallback;
         static AlertBoxCallback AlertBoxCallback;
-        //static TitleChangedCallback titleChangeCallback;
+        static TitleChangedCallback titleChangeCallback;
         static wkeNavigationCallback _wkeNavigationCallback;
+        static wkeConsoleMessageCallback _wkeConsoleMessageCallback;
+        void OnwkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level, IntPtr message, IntPtr sourceName, int sourceLine, IntPtr stackTrace)
+        {
+            Console.WriteLine("Console level" + level);
+            Console.WriteLine("Console Msg:"+wkeGetStringW(message));
+            Console.WriteLine("Console sourceName:" + wkeGetStringW(sourceName));
+            Console.WriteLine("Console stackTrace:" + wkeGetStringW(stackTrace));
+            Console.WriteLine("Console sourceLine:" + sourceLine);
+        }
         public BlinkBrowser()
         {
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             GlobalObjectJs = this;
         }
-
+        void OnTitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title)
+        {
+            //Console.WriteLine(BlinkBrowserPInvoke.wkeGetStringW(title));
+            //base.Text = BlinkBrowserPInvoke.wkeGetStringW(title);
+            if (OnTitleChangeCall != null)
+            {
+                OnTitleChangeCall(webView, param, title);
+            }
+        }
         bool OnwkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
-            
+
             Console.WriteLine(navigationType);
-            Console.WriteLine(BlinkBrowserPInvoke.wkeGetString(url));
+            Console.WriteLine("OnwkeNavigationCallback:URL:" + BlinkBrowserPInvoke.wkeGetString(url));
             //Console.WriteLine(Marshal.PtrToStringAnsi(url));
             //Console.WriteLine(Marshal.PtrToStringAuto(url));
             //Console.WriteLine(Marshal.PtrToStringBSTR(url));
@@ -49,13 +69,13 @@ namespace MiniBlinkPinvoke
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
-            Console.WriteLine(Marshal.PtrToStringAuto(url));
+            Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
         }
         void OnTitleChangeCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
             //Console.WriteLine(Marshal.PtrToStringAnsi(title));
         }
-    
+
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
@@ -75,7 +95,17 @@ namespace MiniBlinkPinvoke
 
                 _wkeNavigationCallback = OnwkeNavigationCallback;
                 //最后这个参数不知道干啥用的，接口声明那不加这个也能调用。
-                BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback,IntPtr.Zero);
+                BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
+
+                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
+                titleChangeCallback = OnTitleChangedCallback;
+
+                BlinkBrowserPInvoke.wkeOnTitleChanged(this.handle, titleChangeCallback, IntPtr.Zero);
+                urlChangedCallback = OnUrlChangedCallback;
+                BlinkBrowserPInvoke.wkeOnURLChanged(this.handle, urlChangedCallback, IntPtr.Zero);
+                _wkeConsoleMessageCallback = OnwkeConsoleMessageCallback;
+                BlinkBrowserPInvoke.wkeOnConsole(this.handle, _wkeConsoleMessageCallback, IntPtr.Zero);
+
             }
         }
         private void Timer_Tick(object sender, EventArgs e)

@@ -9,287 +9,19 @@ using System.IO;
 
 namespace MiniBlinkPinvoke
 {
-    public delegate bool wkeJSSetPropertyCallback(IntPtr es, long @object, [MarshalAs(UnmanagedType.LPWStr)] [In] string propertyName, long value);
-    public delegate long wkeJSGetPropertyCallback(IntPtr es, long @object, [MarshalAs(UnmanagedType.LPWStr)] [In] string propertyName);
-    public delegate void wkeJSFinalizeCallback(ref wkeJSData data);
-    public delegate long wkeJSCallAsFunctionCallback(IntPtr es, long @object, ref long args, int argCount);
-    public delegate void AlertBoxCallback(IntPtr webView, IntPtr msg);
-    public delegate bool ConfirmBoxCallback(IntPtr webView, IntPtr msg);
-    public delegate bool PromptBoxCallback(IntPtr webView, IntPtr msg, IntPtr defaultResult, IntPtr result);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeDocumentReadyCallback(IntPtr webView, IntPtr info);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void ReadFileCallback(IntPtr _caller, [MarshalAs(UnmanagedType.LPStr)]string szFile, SetDataCallback setData);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SetDataCallback(IntPtr _caller, IntPtr data, uint length);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool BeforeSendCallback(IntPtr url, IntPtr method, IntPtr data, long dataSize);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void EweCallBack(IntPtr param0);
-
-    public struct wkeDocumentReadyInfo
-    {
-        public IntPtr url;
-
-        public IntPtr frameJSState;
-
-        public IntPtr mainFrameJSState;
-    }
-    public struct wkeJSData
-    {
-
-        public IntPtr userdata;
-
-        public wkeJSGetPropertyCallback propertyGet;
-
-        public wkeJSSetPropertyCallback propertySet;
-
-        public wkeJSFinalizeCallback finalize;
-
-        public wkeJSCallAsFunctionCallback callAsFunction;
-    }
-    public enum wkeLoadingResult
-    {
-        WKE_LOADING_SUCCEEDED,
-        WKE_LOADING_FAILED,
-        WKE_LOADING_CANCELED
-    }
-
-    public class LoadingFinishEventArgs : EventArgs
-    {
-        [CompilerGenerated]
-        private string string_0;
-        [CompilerGenerated]
-        private string string_1;
-        [CompilerGenerated]
-        private wkeLoadingResult wkeLoadingResult_0;
-
-        public string FailedReason
-        {
-            [CompilerGenerated]
-            get
-            {
-                return this.string_1;
-            }
-            [CompilerGenerated]
-            set
-            {
-                this.string_1 = value;
-            }
-        }
-
-        public wkeLoadingResult LoadingResult
-        {
-            [CompilerGenerated]
-            get
-            {
-                return this.wkeLoadingResult_0;
-            }
-            [CompilerGenerated]
-            set
-            {
-                this.wkeLoadingResult_0 = value;
-            }
-        }
-
-        public string Url
-        {
-            [CompilerGenerated]
-            get
-            {
-                return this.string_0;
-            }
-            [CompilerGenerated]
-            set
-            {
-                this.string_0 = value;
-            }
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct wkeRect
-    {
-        public int x;
-        public int y;
-        public int w;
-        public int h;
-        public Rectangle ToRectangle()
-        {
-            return new Rectangle(this.x, this.y, this.w, this.h);
-        }
-    }
-    public struct wkeConsoleMessage
-    {
-        public wkeMessageSource source;
-
-        public wkeMessageType type;
-
-        public wkeMessageLevel level;
-
-        public IntPtr message;
-
-        public IntPtr url;
-
-        public uint lineNumber;
-    }
-    public enum wkeMessageSource
-    {
-        WKE_MESSAGE_SOURCE_HTML,
-        WKE_MESSAGE_SOURCE_XML,
-        WKE_MESSAGE_SOURCE_JS,
-        WKE_MESSAGE_SOURCE_NETWORK,
-        WKE_MESSAGE_SOURCE_CONSOLE_API,
-        WKE_MESSAGE_SOURCE_OTHER
-    }
-    public enum wkeMessageType
-    {
-        WKE_MESSAGE_TYPE_LOG,
-        WKE_MESSAGE_TYPE_DIR,
-        WKE_MESSAGE_TYPE_DIR_XML,
-        WKE_MESSAGE_TYPE_TRACE,
-        WKE_MESSAGE_TYPE_START_GROUP,
-        WKE_MESSAGE_TYPE_START_GROUP_COLLAPSED,
-        WKE_MESSAGE_TYPE_END_GROUP,
-        WKE_MESSAGE_TYPE_ASSERT
-    }
-    public enum wkeMessageLevel
-    {
-        WKE_MESSAGE_LEVEL_TIP,
-        WKE_MESSAGE_LEVEL_LOG,
-        WKE_MESSAGE_LEVEL_WARNING,
-        WKE_MESSAGE_LEVEL_ERROR,
-        WKE_MESSAGE_LEVEL_DEBUG
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeConsoleMessageCallback(IntPtr webView, ref wkeConsoleMessage message);
-
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeLoadingFinishCallback(IntPtr webView, IntPtr url, wkeLoadingResult result, IntPtr failedReason);
-
     /// <summary>
-    /// 下载回调
-    /// </summary>
-    /// <param name="webView"></param>
-    /// <param name="url"></param>
-    /// <param name="result"></param>
-    /// <param name="failedReason"></param>
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool wkeDownloadFileCallback(IntPtr webView, IntPtr url, IntPtr mimeType);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void TitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title);
-
-    public enum wkeNavigationAction
-    {
-        WKE_NAVIGATION_CONTINUE,
-        WKE_NAVIGATION_ABORT,
-        WKE_NAVIGATION_DOWNLOAD
-    }
-    public enum wkeNavigationType
-    {
-        WKE_NAVIGATION_TYPE_LINKCLICK,
-        WKE_NAVIGATION_TYPE_FORMSUBMITTE,
-        WKE_NAVIGATION_TYPE_BACKFORWARD,
-        WKE_NAVIGATION_TYPE_RELOAD,
-        WKE_NAVIGATION_TYPE_FORMRESUBMITT,
-        WKE_NAVIGATION_TYPE_OTHER
-    }
-
-    public enum WkeCursorInfo
-    {
-        WkeCursorInfoPointer = 0,
-        WkeCursorInfoCross = 1,
-        WkeCursorInfoHand = 2,
-        WkeCursorInfoIBeam = 3,
-        WkeCursorInfoWait = 4,
-        WkeCursorInfoHelp = 5,
-        WkeCursorInfoEastResize = 6,
-        WkeCursorInfoNorthResize = 7,
-        WkeCursorInfoNorthEastResize = 8,
-        WkeCursorInfoNorthWestResize = 9,
-        WkeCursorInfoSouthResize = 10,
-        WkeCursorInfoSouthEastResize = 11,
-        WkeCursorInfoSouthWestResize = 12,
-        WkeCursorInfoWestResize = 13,
-        WkeCursorInfoNorthSouthResize = 14,
-        WkeCursorInfoEastWestResize = 15,
-        WkeCursorInfoNorthEastSouthWestResize = 16,
-        WkeCursorInfoNorthWestSouthEastResize = 17,
-        WkeCursorInfoColumnResize = 18,
-        WkeCursorInfoRowResize = 19,
-    }
-
-    public struct wkeNewViewInfo
-    {
-
-        public wkeNavigationType navigationType;
-
-        public IntPtr url;
-
-        public IntPtr target;
-
-        public int x;
-
-        public int y;
-
-        public int width;
-
-        public int height;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool menuBarVisible;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool statusBarVisible;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool toolBarVisible;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool locationBarVisible;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool scrollbarsVisible;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool resizable;
-
-        [MarshalAs(UnmanagedType.I1)]
-        public bool fullscreen;
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate IntPtr wkeCreateViewCallback(IntPtr webView, IntPtr param, ref wkeNewViewInfo info);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnDidDownloadCallback([MarshalAs(UnmanagedType.LPWStr)] [In] string url, IntPtr data, uint size);
-
-    /// <summary>
-    /// 如需要更完善的功能，请根据Pinvoke封装规则把ewe.h里的API进行封装
+    /// 如需要更完善的功能，请根据Pinvoke封装规则把wke.h里的API进行封装
     /// </summary>
     public static class BlinkBrowserPInvoke
     {
         const string BlinkBrowserdll = "node.dll";
         private static ReadFileCallback readFileCallback;
-        [CompilerGenerated]
         private static OnDidDownloadCallback didDownloadCallback_2;
         private static OnDidDownloadCallback didDownloadCallback_1;
         private static OnDidDownloadCallback didDownloadCallback_0;
-        public delegate Int64 JsCallCallback(IntPtr es);
-        public delegate void UrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate bool wkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate Int64 jsNativeFunction(IntPtr es);
 
-        //[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        //private delegate void PStdCallDelegateVersion(IntPtr context, IntPtr type, IntPtr arg1, IntPtr arg2);
+
         static BlinkBrowserPInvoke()
         {
 
@@ -310,7 +42,6 @@ namespace MiniBlinkPinvoke
             //}
         }
 
-        //DidDownloadCallback([In, MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr data, uint size);
         private static void DownloadCallback(string url, IntPtr data, uint size)
         {
             if (didDownloadCallback_1 != null)
@@ -382,29 +113,29 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnDidDownloadCallback(OnDidDownloadCallback _callback);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr wkeGetStringW(IntPtr @string);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
+        public static extern string wkeGetStringW(IntPtr @string);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern string wkeGetString(IntPtr @string);
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern IntPtr wkeCreateStringW([In] [MarshalAs(UnmanagedType.LPWStr)] string @string,long len);
 
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        ////public static extern void wkeDisableWOFF([MarshalAs(UnmanagedType.I1)] bool isDisable);
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void wkeOnReadFile(ReadFileCallback _callback);
+        //public static extern void wkeDisableWOFF([MarshalAs(UnmanagedType.I1)] bool isDisable);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeOnReadFile(ReadFileCallback _callback);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeBeforeSendCallback(BeforeSendCallback _callback);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeExecCommand(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string command, [In] [MarshalAs(UnmanagedType.LPWStr)] string args);
 
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern IntPtr wkeGetUserAgent(IntPtr handle);
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void wkeSetUserAgent(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void wkeSetUserAgentW(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeGetUserAgent(IntPtr handle);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetUserAgent(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetUserAgentW(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
 
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern void wkeOnJsCall(IntPtr handle, JsCallCallback js);
@@ -585,7 +316,7 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetCookie(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string  wkeGetCookieW(IntPtr webView);
+        public static extern string wkeGetCookieW(IntPtr webView);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Utf8StringToWkeChar([In, MarshalAs(UnmanagedType.LPStr)] string param0);
@@ -674,16 +405,16 @@ namespace MiniBlinkPinvoke
         public static extern void wkeLoadHTML(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string html);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeLoadURL(IntPtr webView, IntPtr url);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
         public static extern void wkeLoadURLW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
         public static extern void wkeLoadFileW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
         public static extern void wkeLoadW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeMalloc(int size);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeOnConsoleMessage(IntPtr webView, wkeConsoleMessageCallback callback);
+        public static extern void wkeOnConsole(IntPtr webView, wkeConsoleMessageCallback callback,IntPtr param);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnCreateView(IntPtr webView, wkeCreateViewCallback callback, IntPtr param);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -754,147 +485,4 @@ namespace MiniBlinkPinvoke
         }
 
     }
-
-    public enum wkeMouseMessage : uint
-    {
-        WKE_MSG_MOUSEMOVE = 0x0200,
-        WKE_MSG_LBUTTONDOWN = 0x0201,
-        WKE_MSG_LBUTTONUP = 0x0202,
-        WKE_MSG_LBUTTONDBLCLK = 0x0203,
-        WKE_MSG_RBUTTONDOWN = 0x0204,
-        WKE_MSG_RBUTTONUP = 0x0205,
-        WKE_MSG_RBUTTONDBLCLK = 0x0206,
-        WKE_MSG_MBUTTONDOWN = 0x0207,
-        WKE_MSG_MBUTTONUP = 0x0208,
-        WKE_MSG_MBUTTONDBLCLK = 0x0209,
-        WKE_MSG_MOUSEWHEEL = 0x020A,
-    }
-    public enum wkeMouseFlags
-    {
-        WKE_LBUTTON = 0x01,
-        WKE_RBUTTON = 0x02,
-        WKE_SHIFT = 0x04,
-        WKE_CONTROL = 0x08,
-        WKE_MBUTTON = 0x10,
-    }
-
-    public enum wkeJSType
-    {
-        JSTYPE_NUMBER,
-        JSTYPE_STRING,
-        JSTYPE_BOOLEAN,
-        JSTYPE_OBJECT,
-        JSTYPE_FUNCTION,
-        JSTYPE_UNDEFINED
-    }
-    public class JsValue
-    {
-        private IntPtr intptr_0;
-        private long long_0;
-
-        public JsValue(long value, IntPtr jsExecState)
-        {
-            this.long_0 = value;
-            this.intptr_0 = jsExecState;
-        }
-
-        public JsValue(IntPtr jsExecState, int argIndex)
-        {
-            this.intptr_0 = jsExecState;
-            this.long_0 = BlinkBrowserPInvoke.jsArg(this.intptr_0, argIndex);
-        }
-
-        public static int ArgCount(IntPtr jsExecState)
-        {
-            return BlinkBrowserPInvoke.jsArgCount(jsExecState);
-        }
-
-        public static long JsDouble(IntPtr jsExecState, double d)
-        {
-            return BlinkBrowserPInvoke.jsDouble(jsExecState, d);
-        }
-
-        public static long JsFalse(IntPtr jsExecState)
-        {
-            return BlinkBrowserPInvoke.jsFalse(jsExecState);
-        }
-
-        public static long JsFloat(IntPtr jsExecState, float f)
-        {
-            return BlinkBrowserPInvoke.jsFloat(jsExecState, f);
-        }
-
-        public static long JsInt(IntPtr jsExecState, int n)
-        {
-            return BlinkBrowserPInvoke.jsInt(jsExecState, n);
-        }
-
-        public static long JsNull(IntPtr jsExecState)
-        {
-            return BlinkBrowserPInvoke.jsNull(jsExecState);
-        }
-
-        public static long JsString(IntPtr jsExecState, string str)
-        {
-            return BlinkBrowserPInvoke.wkeJSString(jsExecState, str);
-        }
-
-        public static long JsTrue(IntPtr jsExecState)
-        {
-            return BlinkBrowserPInvoke.jsTrue(jsExecState);
-        }
-
-        public static long JsUndefined(IntPtr jsExecState)
-        {
-            return BlinkBrowserPInvoke.jsUndefined(jsExecState);
-        }
-
-        public bool ToBool()
-        {
-            return BlinkBrowserPInvoke.jsToBoolean(this.intptr_0, this.long_0);
-        }
-
-        public double ToDouble()
-        {
-            return BlinkBrowserPInvoke.jsToDouble(this.intptr_0, this.long_0);
-        }
-
-        public float ToFloat()
-        {
-            return BlinkBrowserPInvoke.jsToFloat(this.intptr_0, this.long_0);
-        }
-
-        public int ToInt()
-        {
-            return BlinkBrowserPInvoke.jsToInt(this.intptr_0, this.long_0);
-        }
-
-        public override string ToString()
-        {
-            if (this.intptr_0 == IntPtr.Zero)
-            {
-                return string.Empty;
-            }
-            return BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0).IntptrToString();
-        }
-
-        public wkeJSType JsType
-        {
-            get
-            {
-                return BlinkBrowserPInvoke.jsTypeOf(this.intptr_0, this.long_0);
-            }
-        }
-
-        public long Value
-        {
-            get
-            {
-                return this.long_0;
-            }
-        }
-    }
-
-
-
 }
