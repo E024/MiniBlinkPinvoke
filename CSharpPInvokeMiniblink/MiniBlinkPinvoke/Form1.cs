@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using MiniBlinkPinvoke;
 
 namespace MiniBlinkPinvoke
 {
@@ -21,12 +22,13 @@ namespace MiniBlinkPinvoke
         {
             ////blinkBrowser1.handle
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "http://www.w3school.com.cn/tiy/t.asp?f=jseg_isNaN");
-            BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
+            BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://news.cnblogs.com/n/577094/");
             //   EwePInvoke.wkeLoadW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             // EwePInvoke.wkeLoadURL(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
-           //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///E:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
+            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///E:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
+     
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -41,7 +43,7 @@ namespace MiniBlinkPinvoke
 
             //Console.WriteLine(BlinkBrowserPInvoke.wkeCreateStringW("123", "123".Length).IntptrToString());
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
-          MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookieW(blinkBrowser1.handle));
+            MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookieW(blinkBrowser1.handle));
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
         }
@@ -53,7 +55,7 @@ namespace MiniBlinkPinvoke
 
         private void blinkBrowser1_OnTitleChangeCall(IntPtr webView, IntPtr param, IntPtr title)
         {
-            Text = BlinkBrowserPInvoke.wkeGetStringW(title);
+            Text = BlinkBrowserPInvoke.wkeGetString(title).IntptrToString();
         }
     }
 }

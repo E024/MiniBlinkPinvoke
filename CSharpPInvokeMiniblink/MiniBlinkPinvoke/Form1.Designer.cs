@@ -60,9 +60,9 @@
             this.blinkBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.blinkBrowser1.Location = new System.Drawing.Point(-8, 41);
+            this.blinkBrowser1.Location = new System.Drawing.Point(0, 57);
             this.blinkBrowser1.Name = "blinkBrowser1";
-            this.blinkBrowser1.Size = new System.Drawing.Size(713, 270);
+            this.blinkBrowser1.Size = new System.Drawing.Size(710, 251);
             this.blinkBrowser1.TabIndex = 3;
             this.blinkBrowser1.Text = "blinkBrowser1";
             this.blinkBrowser1.OnTitleChangeCall += new MiniBlinkPinvoke.TitleChangedCallback(this.blinkBrowser1_OnTitleChangeCall);

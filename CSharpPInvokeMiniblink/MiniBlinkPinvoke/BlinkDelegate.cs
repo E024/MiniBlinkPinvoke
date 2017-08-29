@@ -7,6 +7,8 @@ using System.Text;
 namespace MiniBlinkPinvoke
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void wkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool wkeJSSetPropertyCallback(IntPtr es, long @object, [MarshalAs(UnmanagedType.LPWStr)] [In] string propertyName, long value);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate long wkeJSGetPropertyCallback(IntPtr es, long @object, [MarshalAs(UnmanagedType.LPWStr)] [In] string propertyName);
@@ -20,7 +22,7 @@ namespace MiniBlinkPinvoke
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool PromptBoxCallback(IntPtr webView, IntPtr msg, IntPtr defaultResult, IntPtr result);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeDocumentReadyCallback(IntPtr webView, IntPtr info);
+    public delegate void wkeDocumentReadyCallback(IntPtr webView, IntPtr param);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ReadFileCallback(IntPtr _caller, [MarshalAs(UnmanagedType.LPStr)]string szFile, SetDataCallback setData);
@@ -32,10 +34,10 @@ namespace MiniBlinkPinvoke
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void EweCallBack(IntPtr param0);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level,IntPtr message,IntPtr sourceName,int sourceLine,IntPtr stackTrace);
+    public delegate void wkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level, IntPtr message, IntPtr sourceName, int sourceLine, IntPtr stackTrace);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void wkeLoadingFinishCallback(IntPtr webView, IntPtr url, wkeLoadingResult result, IntPtr failedReason);
+    public delegate void wkeLoadingFinishCallback(IntPtr webView, IntPtr param, IntPtr url, wkeLoadingResult result, IntPtr failedReason);
     /// <summary>
     /// 下载回调
     /// </summary>
@@ -44,12 +46,12 @@ namespace MiniBlinkPinvoke
     /// <param name="result"></param>
     /// <param name="failedReason"></param>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool wkeDownloadFileCallback(IntPtr webView, IntPtr url, IntPtr mimeType);
+    public delegate bool wkeDownloadFileCallback(IntPtr webView, IntPtr param, string url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void TitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate IntPtr wkeCreateViewCallback(IntPtr webView, IntPtr param, ref wkeNewViewInfo info);
+    public delegate IntPtr wkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnDidDownloadCallback([MarshalAs(UnmanagedType.LPWStr)] [In] string url, IntPtr data, uint size);
@@ -60,6 +62,10 @@ namespace MiniBlinkPinvoke
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool wkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Auto)]
+    public delegate bool wkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, IntPtr url, IntPtr job);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Int64 jsNativeFunction(IntPtr es);
 }

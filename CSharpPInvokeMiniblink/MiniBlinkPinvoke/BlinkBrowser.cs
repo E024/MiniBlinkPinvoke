@@ -14,8 +14,10 @@ namespace MiniBlinkPinvoke
 {
     public class BlinkBrowser : Control
     {
+
+
         public IntPtr handle = IntPtr.Zero;
-        Timer timer = new Timer { Interval = 25 };
+        //Timer timer = new Timer { Interval = 25 };
         string url = string.Empty;
 
         IntPtr bits = IntPtr.Zero;
@@ -28,18 +30,61 @@ namespace MiniBlinkPinvoke
 
         //public event wkeDocumentReadyCallback DocumentReadyCallback;
 
+        List<object> listObj = new List<object>();
+
         static UrlChangedCallback urlChangedCallback;
         static AlertBoxCallback AlertBoxCallback;
         static TitleChangedCallback titleChangeCallback;
         static wkeNavigationCallback _wkeNavigationCallback;
         static wkeConsoleMessageCallback _wkeConsoleMessageCallback;
+        static wkePaintUpdatedCallback _wkePaintUpdatedCallback;
+        static wkeDocumentReadyCallback _wkeDocumentReadyCallback;
+        static wkeLoadingFinishCallback _wkeLoadingFinishCallback;
+        static wkeDownloadFileCallback _wkeDownloadFileCallback;
+        static wkeCreateViewCallback _wkeCreateViewCallback;
+        static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
+        bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, IntPtr url, IntPtr job)
+        {
+            var _url = url.IntptrToString();
+            if (_url.StartsWith("https://news.cnblogs.com/"))
+            {
+                string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
+                wkeNetSetMIMEType(job, "text/html");
+                wkeNetSetURL(job, url);
+                wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Unicode.GetBytes(data).Length);
+                return true;
+            }
+            Console.WriteLine("OnwkeLoadUrlBeginCallback url:" + url.IntptrToString());
+            return false;
+        }
+
+        IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
+        {
+            Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).IntptrToString());
+            Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
+            return BlinkBrowserPInvoke.browser2;
+        }
+        bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
+        {
+            Console.WriteLine("call OnwkeDownloadFileCallback:" + (url));
+            return true;
+        }
+
+        void OnwkeLoadingFinishCallback(IntPtr webView, IntPtr param, IntPtr url, wkeLoadingResult result, IntPtr failedReason)
+        {
+            Console.WriteLine("call OnwkeLoadingFinishCallback:" + wkeGetString(url).IntptrToString());
+        }
+        void OnwkeDocumentReadyCallback(IntPtr webView, IntPtr param)
+        {
+            Console.WriteLine("call OnwkeDocumentReadyCallback:" + Marshal.PtrToStringUni(param));//.IntptrToString());
+        }
         void OnwkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level, IntPtr message, IntPtr sourceName, int sourceLine, IntPtr stackTrace)
         {
-            Console.WriteLine("Console level" + level);
-            Console.WriteLine("Console Msg:"+wkeGetStringW(message));
-            Console.WriteLine("Console sourceName:" + wkeGetStringW(sourceName));
-            Console.WriteLine("Console stackTrace:" + wkeGetStringW(stackTrace));
-            Console.WriteLine("Console sourceLine:" + sourceLine);
+            //Console.WriteLine("Console level" + level);
+            Console.WriteLine("Console Msg:" + wkeGetString(message).IntptrToString());
+            //Console.WriteLine("Console sourceName:" + wkeGetString(sourceName).IntptrToString());
+            //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).IntptrToString());
+            //Console.WriteLine("Console sourceLine:" + sourceLine);
         }
         public BlinkBrowser()
         {
@@ -59,7 +104,7 @@ namespace MiniBlinkPinvoke
         {
 
             Console.WriteLine(navigationType);
-            Console.WriteLine("OnwkeNavigationCallback:URL:" + BlinkBrowserPInvoke.wkeGetString(url));
+            Console.WriteLine("OnwkeNavigationCallback:URL:" + BlinkBrowserPInvoke.wkeGetStringW(url));
             //Console.WriteLine(Marshal.PtrToStringAnsi(url));
             //Console.WriteLine(Marshal.PtrToStringAuto(url));
             //Console.WriteLine(Marshal.PtrToStringBSTR(url));
@@ -69,11 +114,20 @@ namespace MiniBlinkPinvoke
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
-            Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
+            //Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
         }
         void OnTitleChangeCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
             //Console.WriteLine(Marshal.PtrToStringAnsi(title));
+        }
+
+        void OnWkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
+        {
+            //Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
+            if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
+            {
+                Invalidate();
+            }
         }
 
         protected override void OnCreateControl()
@@ -81,8 +135,8 @@ namespace MiniBlinkPinvoke
             base.OnCreateControl();
             if (!DesignMode)
             {
-                timer.Tick += Timer_Tick;
-                timer.Start();
+                //timer.Tick += Timer_Tick;
+                //timer.Start();
                 BlinkBrowserPInvoke.wkeInitialize();
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
@@ -94,28 +148,57 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
                 _wkeNavigationCallback = OnwkeNavigationCallback;
-                //最后这个参数不知道干啥用的，接口声明那不加这个也能调用。
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
+                listObj.Add(_wkeNavigationCallback);
 
-                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
+                //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
                 titleChangeCallback = OnTitleChangedCallback;
-
                 BlinkBrowserPInvoke.wkeOnTitleChanged(this.handle, titleChangeCallback, IntPtr.Zero);
+                listObj.Add(titleChangeCallback);
+
                 urlChangedCallback = OnUrlChangedCallback;
                 BlinkBrowserPInvoke.wkeOnURLChanged(this.handle, urlChangedCallback, IntPtr.Zero);
+                listObj.Add(urlChangedCallback);
+
                 _wkeConsoleMessageCallback = OnwkeConsoleMessageCallback;
                 BlinkBrowserPInvoke.wkeOnConsole(this.handle, _wkeConsoleMessageCallback, IntPtr.Zero);
+                listObj.Add(_wkeConsoleMessageCallback);
+
+                _wkePaintUpdatedCallback = OnWkePaintUpdatedCallback;
+                BlinkBrowserPInvoke.wkeOnPaintUpdated(this.handle, _wkePaintUpdatedCallback, IntPtr.Zero);
+                listObj.Add(_wkePaintUpdatedCallback);
+
+                _wkeDocumentReadyCallback = OnwkeDocumentReadyCallback;
+                var pa = Marshal.StringToCoTaskMemUni("我传的值：：：：：");
+                BlinkBrowserPInvoke.wkeOnDocumentReady(this.handle, _wkeDocumentReadyCallback, pa);
+                listObj.Add(_wkeDocumentReadyCallback);
+
+
+                _wkeLoadingFinishCallback = OnwkeLoadingFinishCallback;
+                BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
+                listObj.Add(_wkeLoadingFinishCallback);
+
+                _wkeDownloadFileCallback = OnwkeDownloadFileCallback;
+                BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
+                listObj.Add(_wkeDownloadFileCallback);
+
+                _wkeCreateViewCallback = OnwkeCreateViewCallback;
+                BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
+                listObj.Add(_wkeCreateViewCallback);
+
+                _wkeLoadUrlBeginCallback = OnwkeLoadUrlBeginCallback;
+                BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
+                listObj.Add(_wkeLoadUrlBeginCallback);
 
             }
         }
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
-            {
-                Invalidate();
-            }
-        }
-
+        //private void Timer_Tick(object sender, EventArgs e)
+        //{
+        //    if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
+        //    {
+        //        Invalidate();
+        //    }
+        //}
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -145,11 +228,12 @@ namespace MiniBlinkPinvoke
                 e.Graphics.DrawString("MiniBlinkBrowser", this.Font, Brushes.Red, new Point());
                 e.Graphics.DrawRectangle(Pens.Black, new Rectangle(0, 0, Width - 1, Height - 1));
             }
-            Application.DoEvents();
-            GC.Collect();
+            //Application.DoEvents();
+            //GC.Collect();
         }
         void SetCursors()
         {
+            Console.WriteLine("wkeGetCursorInfoType:  " + BlinkBrowserPInvoke.wkeGetCursorInfoType(handle));
             switch (BlinkBrowserPInvoke.wkeGetCursorInfoType(handle))
             {
                 case WkeCursorInfo.WkeCursorInfoPointer:
@@ -213,6 +297,7 @@ namespace MiniBlinkPinvoke
                     Cursor = Cursors.Default;
                     break;
                 default:
+                    Cursor = Cursors.Default;
                     break;
             }
         }
@@ -508,7 +593,18 @@ namespace MiniBlinkPinvoke
         {
             MessageBox.Show("Console_WriteLine w 方法被调用了：" + msg2 + " " + msg);
         }
-
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        public static void ClearMemory()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+            }
+        }
 
     }
     public class JSFunctin : Attribute
