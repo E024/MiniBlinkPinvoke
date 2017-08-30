@@ -64,7 +64,7 @@ namespace MiniBlinkPinvoke
     public delegate bool wkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Auto)]
-    public delegate bool wkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, IntPtr url, IntPtr job);
+    public delegate bool wkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, [MarshalAs(UnmanagedType.LPStr)] string url, IntPtr job);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Int64 jsNativeFunction(IntPtr es);

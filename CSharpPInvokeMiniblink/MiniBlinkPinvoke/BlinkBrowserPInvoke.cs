@@ -138,12 +138,12 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeBeforeSendCallback(BeforeSendCallback _callback);
 
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
+        public static extern void wkeNetSetMIMEType(IntPtr job, IntPtr type);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeNetSetMIMEType(IntPtr job, string type);
+        public static extern void wkeNetSetURL(IntPtr job, [MarshalAs(UnmanagedType.LPStr)]string url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeNetSetURL(IntPtr job, IntPtr url);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeNetSetData(IntPtr job, IntPtr buf,int len);
+        public static extern void wkeNetSetData(IntPtr job, IntPtr buf, int len);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeExecCommand(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string command, [In] [MarshalAs(UnmanagedType.LPWStr)] string args);
@@ -337,6 +337,8 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr wkeGetCookie(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern string wkeGetCookieW(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern string wkeSetCookieJarPath(IntPtr webView, [MarshalAs(UnmanagedType.LPStr)] [In] string path);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Utf8StringToWkeChar([In, MarshalAs(UnmanagedType.LPStr)] string param0);

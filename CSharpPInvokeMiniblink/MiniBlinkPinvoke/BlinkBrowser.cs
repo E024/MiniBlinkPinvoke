@@ -43,18 +43,18 @@ namespace MiniBlinkPinvoke
         static wkeDownloadFileCallback _wkeDownloadFileCallback;
         static wkeCreateViewCallback _wkeCreateViewCallback;
         static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
-        bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, IntPtr url, IntPtr job)
+        bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
         {
-            var _url = url.IntptrToString();
-            if (_url.StartsWith("https://news.cnblogs.com/"))
-            {
-                string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
-                wkeNetSetMIMEType(job, "text/html");
-                wkeNetSetURL(job, url);
-                wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Unicode.GetBytes(data).Length);
-                return true;
-            }
-            Console.WriteLine("OnwkeLoadUrlBeginCallback url:" + url.IntptrToString());
+            var _url = url;
+            //if (_url.StartsWith("https://news.cnblogs.com/"))
+            //{
+            //    string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
+            //    wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemUni("text/html"));
+            //    wkeNetSetURL(job, url);
+            //    wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Unicode.GetBytes(data).Length);
+            //    return true;
+            //}
+            Console.WriteLine("OnwkeLoadUrlBeginCallback url:" + url);
             return false;
         }
 
@@ -62,7 +62,7 @@ namespace MiniBlinkPinvoke
         {
             Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).IntptrToString());
             Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
-            return BlinkBrowserPInvoke.browser2;
+            return webView;
         }
         bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
         {
@@ -73,6 +73,15 @@ namespace MiniBlinkPinvoke
         void OnwkeLoadingFinishCallback(IntPtr webView, IntPtr param, IntPtr url, wkeLoadingResult result, IntPtr failedReason)
         {
             Console.WriteLine("call OnwkeLoadingFinishCallback:" + wkeGetString(url).IntptrToString());
+            Console.WriteLine("call OnwkeLoadingFinishCallback result:" + result);
+            if (result == wkeLoadingResult.WKE_LOADING_FAILED)
+            {
+                Console.WriteLine("call OnwkeLoadingFinishCallback failedReason:" + wkeGetString(failedReason).IntptrToString());
+            }
+            else
+            {
+                Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).IntptrToString());
+            }
         }
         void OnwkeDocumentReadyCallback(IntPtr webView, IntPtr param)
         {
@@ -151,7 +160,11 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
                 listObj.Add(_wkeNavigationCallback);
 
-                //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
+                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
+                BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
+
+
+
                 titleChangeCallback = OnTitleChangedCallback;
                 BlinkBrowserPInvoke.wkeOnTitleChanged(this.handle, titleChangeCallback, IntPtr.Zero);
                 listObj.Add(titleChangeCallback);
