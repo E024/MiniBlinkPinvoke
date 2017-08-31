@@ -170,6 +170,7 @@ namespace MiniBlinkPinvoke
         public static extern long jsStringW(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern long jsString(IntPtr es, IntPtr str);
+
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern long wkeJSCallGlobal(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
 

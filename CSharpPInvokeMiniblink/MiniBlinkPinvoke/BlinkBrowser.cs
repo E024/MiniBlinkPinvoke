@@ -203,7 +203,7 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
                 listObj.Add(_wkeLoadUrlBeginCallback);
 
-                #region JS 东塔绑定，并返回值
+                #region JS 动态绑定，并返回值
                 jsNativeFunction jsnav = new jsNativeFunction((es) =>
                 {
 
@@ -212,6 +212,16 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.jsBindFunction("jsReturnValueTest", jsnav, 1);
                 listObj.Add(jsnav);
                 #endregion
+
+                jsNativeFunction jsnavSet = new jsNativeFunction((es) =>
+                {
+                    Console.WriteLine("call jsBindSetter");
+                    return 0L;
+                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
+                });
+                BlinkBrowserPInvoke.jsBindSetter("testJson", jsnavSet);
+                listObj.Add(jsnavSet);
+
 
             }
         }
