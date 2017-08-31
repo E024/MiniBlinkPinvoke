@@ -76,7 +76,7 @@ namespace MiniBlinkPinvoke
             Console.WriteLine("call OnwkeLoadingFinishCallback result:" + result);
             if (result == wkeLoadingResult.WKE_LOADING_FAILED)
             {
-                Console.WriteLine("call OnwkeLoadingFinishCallback failedReason:" + wkeGetString(failedReason).IntptrToString());
+                Console.WriteLine("call OnwkeLoadingFinishCallback 加载失败 failedReason:" + wkeGetString(failedReason).IntptrToString());
             }
             else
             {
@@ -123,11 +123,11 @@ namespace MiniBlinkPinvoke
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
-            //Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
+            Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
         }
         void OnTitleChangeCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
-            //Console.WriteLine(Marshal.PtrToStringAnsi(title));
+            Console.WriteLine(Marshal.PtrToStringAnsi(title));
         }
 
         void OnWkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
@@ -246,7 +246,7 @@ namespace MiniBlinkPinvoke
         }
         void SetCursors()
         {
-            Console.WriteLine("wkeGetCursorInfoType:  " + BlinkBrowserPInvoke.wkeGetCursorInfoType(handle));
+            //Console.WriteLine("wkeGetCursorInfoType:  " + BlinkBrowserPInvoke.wkeGetCursorInfoType(handle));
             switch (BlinkBrowserPInvoke.wkeGetCursorInfoType(handle))
             {
                 case WkeCursorInfo.WkeCursorInfoPointer:
