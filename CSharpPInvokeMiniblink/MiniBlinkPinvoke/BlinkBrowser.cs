@@ -203,6 +203,16 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
                 listObj.Add(_wkeLoadUrlBeginCallback);
 
+                #region JS 东塔绑定，并返回值
+                jsNativeFunction jsnav = new jsNativeFunction((es) =>
+                {
+
+                    return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
+                });
+                BlinkBrowserPInvoke.jsBindFunction("jsReturnValueTest", jsnav, 1);
+                listObj.Add(jsnav);
+                #endregion
+
             }
         }
         //private void Timer_Tick(object sender, EventArgs e)
@@ -596,6 +606,9 @@ namespace MiniBlinkPinvoke
                 }
             }
         }
+
+        public string JsGetValue { get; set; }
+
         [JSFunctin]
         public void Console_WriteLine(string msg)
         {

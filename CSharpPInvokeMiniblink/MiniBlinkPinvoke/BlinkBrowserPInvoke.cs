@@ -159,11 +159,17 @@ namespace MiniBlinkPinvoke
         //public static extern void wkeOnJsCall(IntPtr handle, JsCallCallback js);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        // public static extern void wkeJSSimpleBind(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string name, jsNativeFunction fn);
         public static extern void jsBindFunction([MarshalAs(UnmanagedType.LPStr)] [In] string name, jsNativeFunction fn, uint argCount);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern long wkeJSString(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
+        public static extern void jsBindGetter([MarshalAs(UnmanagedType.LPStr)] [In] string name, jsNativeFunction fn);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void jsBindSetter([MarshalAs(UnmanagedType.LPStr)] [In] string name, jsNativeFunction fn);
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern long jsStringW(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern long jsString(IntPtr es, IntPtr str);
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern long wkeJSCallGlobal(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
 

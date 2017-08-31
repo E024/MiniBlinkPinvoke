@@ -54,7 +54,7 @@ namespace MiniBlinkPinvoke
 
         public static long JsString(IntPtr jsExecState, string str)
         {
-            return BlinkBrowserPInvoke.wkeJSString(jsExecState, str);
+            return BlinkBrowserPInvoke.jsStringW(jsExecState, str);
         }
 
         public static long JsTrue(IntPtr jsExecState)
