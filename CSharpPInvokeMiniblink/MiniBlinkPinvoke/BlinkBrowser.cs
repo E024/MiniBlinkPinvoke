@@ -50,19 +50,32 @@ namespace MiniBlinkPinvoke
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
             Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
+            Console.WriteLine(buf.IntptrToString().Length);
+            //  Marshal.Release(buf);
         }
 
         bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
         {
             var _url = url;
-            //if (_url.StartsWith("https://news.cnblogs.com/"))
-            //{
-            //    string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
-            //    wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemUni("text/html"));
-            //    wkeNetSetURL(job, url);
-            //    wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Unicode.GetBytes(data).Length);
-            //    return true;
-            //}
+            if (_url.StartsWith("https://news.cnblogs.com/"))
+            {
+                //
+                string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
+                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
+                wkeNetSetURL(job, url);
+                var dataByte = Encoding.UTF8.GetBytes(data);
+                IntPtr dataPtr = Marshal.AllocHGlobal(dataByte.Length);
+                Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, dataPtr, dataByte.Length);
+                wkeNetSetData(job, dataPtr, Encoding.UTF8.GetBytes(data).Length);
+                Marshal.Release(dataPtr);
+                return true;
+            }
+            else
+            {
+                //如果需要 OnwkeLoadUrlEndCallback 回调，需要取消注释下面的 hook
+                //wkeNetHookRequest(job);
+
+            }
             Console.WriteLine("OnwkeLoadUrlBeginCallback url:" + url);
             return false;
         }
@@ -234,10 +247,10 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
                 listObj.Add(_wkeNavigationCallback);
 
-                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
-                BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
+                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
+                //BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
 
-
+                //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
 
                 titleChangeCallback = OnTitleChangedCallback;
                 BlinkBrowserPInvoke.wkeOnTitleChanged(this.handle, titleChangeCallback, IntPtr.Zero);
@@ -265,9 +278,10 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
                 listObj.Add(_wkeLoadingFinishCallback);
 
-                _wkeDownloadFileCallback = OnwkeDownloadFileCallback;
-                BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
-                listObj.Add(_wkeDownloadFileCallback);
+                ////会导致 taobao 加载图片异常
+                //_wkeDownloadFileCallback = OnwkeDownloadFileCallback;
+                //BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
+                //listObj.Add(_wkeDownloadFileCallback);
 
                 _wkeCreateViewCallback = OnwkeCreateViewCallback;
                 BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
@@ -286,19 +300,30 @@ namespace MiniBlinkPinvoke
                 listObj.Add(jsnav);
                 #endregion
 
-                //jsNativeFunction jsnav2 = new jsNativeFunction((es) =>
-                // {
-                //     Console.WriteLine("调用了 testJson");
-                //     return 0;
-                // });
-                //BlinkBrowserPInvoke.jsBindGetter("testChangeProp", jsnav2);
-                //jsNativeFunction jsnav3 = new jsNativeFunction((es) =>
-                // {
-                //     Console.WriteLine("调用了 testJson");
-                //     return 0;
-                // });
-                //BlinkBrowserPInvoke.jsBindSetter("testChangeProp", jsnav2);
-                //listObj.Add(jsnav3);
+                // get
+                jsNativeFunction jsnavGet = new jsNativeFunction((es) =>
+                {
+                    Console.WriteLine("call jsBindGetter");
+                    return jsStringW(es, "{ \"name\": \"he\" }");
+                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
+                });
+                BlinkBrowserPInvoke.jsBindGetter("testJson", jsnavGet);
+                listObj.Add(jsnavGet);
+
+                // set
+                jsNativeFunction jsnavSet = new jsNativeFunction((es) =>
+                {
+                    Console.WriteLine("call jsBindSetter");
+
+                    Int64 testJson = jsArg(es, 0);
+                    IntPtr argStr = jsToStringW(es, testJson);
+                    string argString = Marshal.PtrToStringUni(argStr);
+                    MessageBox.Show(argString, "alert setter");
+
+                    return jsUndefined(es);
+                });
+                BlinkBrowserPInvoke.jsBindSetter("testJson", jsnavSet);
+                listObj.Add(jsnavSet);
 
                 _wkeLoadUrlEndCallback = OnwkeLoadUrlEndCallback;
                 BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);

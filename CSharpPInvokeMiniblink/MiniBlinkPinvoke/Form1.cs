@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using MiniBlinkPinvoke;
+using System.IO;
 
 namespace MiniBlinkPinvoke
 {
@@ -24,8 +25,8 @@ namespace MiniBlinkPinvoke
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "http://www.w3school.com.cn/tiy/t.asp?f=jseg_isNaN");
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://news.cnblogs.com/n/577094/");
             //   EwePInvoke.wkeLoadW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
-            // EwePInvoke.wkeLoadURL(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
-            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///E:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
+            // EwePInvoke.wkeLoadURL(blinkBrowser1.handle, "file:///MiniBxlinkPinvoke/index.html");
+            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///F:/Project/CSharpPInvokeMiniblink/MiniBlinkPinvoke/index.html");
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
             //https://www.lyblog.net/detail/314.html
@@ -45,14 +46,20 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(BlinkBrowserPInvoke.wkeCreateStringW("123", "123".Length).IntptrToString());
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetCookieW(blinkBrowser1.handle));
-            BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "http://tests/getsource");
+            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "http://tests/getsource");
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
+            MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
+
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            if (File.Exists("cookies.dat"))
+            {
+                File.Delete("cookies.dat");
+            }
         }
 
         private void blinkBrowser1_OnTitleChangeCall(IntPtr webView, IntPtr param, IntPtr title)

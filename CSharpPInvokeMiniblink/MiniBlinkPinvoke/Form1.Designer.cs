@@ -93,19 +93,19 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(670, 21);
             this.textBox1.TabIndex = 5;
-            this.textBox1.Text = "https://www.baidu.com/";
+            this.textBox1.Text = "https://www.taobao.com/";
             // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.asdfToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(102, 26);
             // 
             // asdfToolStripMenuItem
             // 
             this.asdfToolStripMenuItem.Name = "asdfToolStripMenuItem";
-            this.asdfToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.asdfToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.asdfToolStripMenuItem.Text = "asdf";
             // 
             // Form1

@@ -146,6 +146,8 @@ namespace MiniBlinkPinvoke
         public static extern void wkeNetSetURL(IntPtr job, [MarshalAs(UnmanagedType.LPStr)]string url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeNetSetData(IntPtr job, IntPtr buf, int len);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeNetHookRequest(IntPtr job);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeExecCommand(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string command, [In] [MarshalAs(UnmanagedType.LPWStr)] string args);
@@ -169,9 +171,9 @@ namespace MiniBlinkPinvoke
         public static extern void jsBindSetter([MarshalAs(UnmanagedType.LPStr)] [In] string name, jsNativeFunction fn);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern long jsStringW(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
+        public static extern Int64 jsStringW(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern long jsString(IntPtr es, IntPtr str);
+        public static extern Int64 jsString(IntPtr es, IntPtr str);
 
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern long wkeJSCallGlobal(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
@@ -180,7 +182,7 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr jsToString(IntPtr es, long v);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string jsToStringW(IntPtr es, long v);
+        public static extern IntPtr jsToStringW(IntPtr es, long v);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern wkeJSData wkeJSGetData(IntPtr es, long jsValue);
@@ -213,7 +215,7 @@ namespace MiniBlinkPinvoke
         public static extern void wkePaintDC(IntPtr handle, IntPtr hdc);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern long jsArg(IntPtr es, int argIdx);
+        public static extern Int64 jsArg(IntPtr es, int argIdx);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int jsArgCount(IntPtr wkeJSState);

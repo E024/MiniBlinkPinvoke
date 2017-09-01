@@ -8,7 +8,9 @@
         //Console_WriteLine("er");
 
         //alert("hha");
-        var testChangeProp = { "name": "" };
+
+        //var testJson = '{ "name": "he" }';
+
         function testInt() {
             return 1213;
         }
@@ -23,24 +25,20 @@
         //var xc =JsGetValue;
         Console_WriteLine(res);
         //Console_WriteLine2(1231511, "第二个参数");
+        setTimeout(function () {
+            //testJson.name = "C#";
+            testJson = '{ "name": "he11111111111111111111111" }';
+            console.log("testJson:" + testJson);
+        }, 2000);
     </script>
 </head>
 <!--设置margin才能显示阴影-->
 <body style="margin:8px;">
     documen
-    <br />
-    <a id="testChange">修改前</a>
-    <br />
     <div>
         <a href="https://files.cnblogs.com/files/xt_hjl/123.rar">下载测试</a>
         <a href="https://www.baidu.com/" target="_blank">百度一下</a>
     </div>
-    <script>
-        setTimeout(function () {
-            testChangeProp.name = "c#";
-            document.getElementById("testChange").innerHTML = testChangeProp.name;
-        }, 2000);
-    </script>
 </body>
 
 </html>
