@@ -97,17 +97,19 @@ namespace MiniBlinkPinvoke
         }
         public BlinkBrowser()
         {
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+      ControlStyles.DoubleBuffer |
+           ControlStyles.AllPaintingInWmPaint |
+           ControlStyles.ResizeRedraw |
+           //  ControlStyles.EnableNotifyMessage|
+           ControlStyles.UserPaint, true);
             GlobalObjectJs = this;
         }
         void OnTitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
             //Console.WriteLine(BlinkBrowserPInvoke.wkeGetStringW(title));
             //base.Text = BlinkBrowserPInvoke.wkeGetStringW(title);
-            if (OnTitleChangeCall != null)
-            {
-                OnTitleChangeCall(webView, param, title);
-            }
+            OnTitleChangeCall?.Invoke(webView, param, title);
         }
         bool OnwkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
@@ -135,7 +137,12 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
             if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             {
-                Invalidate();
+               Invalidate(new Rectangle(x, y, cx, cy), false);
+                //Invalidate();
+
+
+
+
             }
         }
 
@@ -206,23 +213,19 @@ namespace MiniBlinkPinvoke
                 #region JS 动态绑定，并返回值
                 jsNativeFunction jsnav = new jsNativeFunction((es) =>
                 {
-
                     return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
                 });
                 BlinkBrowserPInvoke.jsBindFunction("jsReturnValueTest", jsnav, 1);
                 listObj.Add(jsnav);
                 #endregion
 
-                jsNativeFunction jsnavSet = new jsNativeFunction((es) =>
-                {
-                    Console.WriteLine("call jsBindSetter");
-                    return 0L;
-                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
-                });
-                BlinkBrowserPInvoke.jsBindSetter("testJson", jsnavSet);
-                listObj.Add(jsnavSet);
-
-
+                //jsNativeFunction jsnav2 = new jsNativeFunction((es) =>
+                // {
+                //     Console.WriteLine("调用了 testJson");
+                //     return 0L;
+                // });
+                //BlinkBrowserPInvoke.jsBindSetter("testChangeProp", jsnav2);
+                //listObj.Add(jsnav2);
             }
         }
         //private void Timer_Tick(object sender, EventArgs e)
@@ -234,28 +237,34 @@ namespace MiniBlinkPinvoke
         //}
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e);
+
             if (handle != IntPtr.Zero)
             {
-                if (bits == IntPtr.Zero || oldSize != Size)
+                lock (LockObj)
                 {
-                    if (bits != IntPtr.Zero)
+                    if (bits == IntPtr.Zero || oldSize != Size)
                     {
-                        Marshal.FreeHGlobal(bits);
+                        if (bits != IntPtr.Zero)
+                        {
+                            Marshal.FreeHGlobal(bits);
+                        }
+                        oldSize = Size;
+                        bits = Marshal.AllocHGlobal(Width * Height * 4);
                     }
-                    oldSize = Size;
-                    bits = Marshal.AllocHGlobal(Width * Height * 4);
-                }
 
-                BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
-                using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
-                {
-                    e.Graphics.DrawImage(bmp, 0, 0);
+                    BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
+                    using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
+                    {
+                        e.Graphics.DrawImage(bmp, 0, 0);
+                    }
                 }
-
                 SetCursors();
-
             }
+            else
+            {
+                base.OnPaint(e);
+            }
+            //base.OnPaint(e);
             if (DesignMode)
             {
                 e.Graphics.DrawString("MiniBlinkBrowser", this.Font, Brushes.Red, new Point());
