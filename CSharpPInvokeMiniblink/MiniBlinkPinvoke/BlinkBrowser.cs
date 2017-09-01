@@ -104,7 +104,7 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).IntptrToString());
             //Console.WriteLine("Console sourceLine:" + sourceLine);
         }
-        ContextMenuStrip contextMenuStrip1 = new ContextMenuStrip();
+        ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
         public BlinkBrowser()
         {
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
@@ -127,18 +127,25 @@ namespace MiniBlinkPinvoke
             });
 
 
-            contextMenuStrip1.Opening += ContextMenuStrip1_Opening;
+            contextMenuStrip.Opening += ContextMenuStrip1_Opening;
 
-            ContextMenuStrip = contextMenuStrip1;
+            ContextMenuStrip = contextMenuStrip;
             ToolStripMenuItem tsmi = new ToolStripMenuItem("返回", null, (x, y) =>
             {
                 wkeGoBack(handle);
             });
-            ToolStripMenuItem tsmif = new ToolStripMenuItem("前进", null, (x, y) => {
+            ToolStripMenuItem tsmif = new ToolStripMenuItem("前进", null, (x, y) =>
+            {
                 wkeGoForward(handle);
             });
+            ToolStripMenuItem tsmir = new ToolStripMenuItem("重新加载", null, (x, y) =>
+            {
+                wkeReload(handle);
+            });
 
-            contextMenuStrip1.Items.Add(tsmi); contextMenuStrip1.Items.Add(tsmif);
+            contextMenuStrip.Items.Add(tsmi);
+            contextMenuStrip.Items.Add(tsmif);
+            contextMenuStrip.Items.Add(tsmir);
 
             GlobalObjectJs = this;
         }
@@ -149,7 +156,7 @@ namespace MiniBlinkPinvoke
             {
                 lock (LockObj)
                 {
-                    foreach (ToolStripMenuItem item in contextMenuStrip1.Items)
+                    foreach (ToolStripMenuItem item in contextMenuStrip.Items)
                     {
                         if (item.Text == "返回")
                         {
