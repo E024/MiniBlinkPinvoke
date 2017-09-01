@@ -43,6 +43,7 @@ namespace MiniBlinkPinvoke
         static wkeDownloadFileCallback _wkeDownloadFileCallback;
         static wkeCreateViewCallback _wkeCreateViewCallback;
         static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
+        private System.ComponentModel.IContainer components;
         static wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
 
@@ -103,6 +104,7 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).IntptrToString());
             //Console.WriteLine("Console sourceLine:" + sourceLine);
         }
+        ContextMenuStrip contextMenuStrip1 = new ContextMenuStrip();
         public BlinkBrowser()
         {
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
@@ -125,7 +127,42 @@ namespace MiniBlinkPinvoke
             });
 
 
+            contextMenuStrip1.Opening += ContextMenuStrip1_Opening;
+
+            ContextMenuStrip = contextMenuStrip1;
+            ToolStripMenuItem tsmi = new ToolStripMenuItem("返回", null, (x, y) =>
+            {
+                wkeGoBack(handle);
+            });
+            ToolStripMenuItem tsmif = new ToolStripMenuItem("前进", null, (x, y) => {
+                wkeGoForward(handle);
+            });
+
+            contextMenuStrip1.Items.Add(tsmi); contextMenuStrip1.Items.Add(tsmif);
+
             GlobalObjectJs = this;
+        }
+
+        private void ContextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.handle != IntPtr.Zero)
+            {
+                lock (LockObj)
+                {
+                    foreach (ToolStripMenuItem item in contextMenuStrip1.Items)
+                    {
+                        if (item.Text == "返回")
+                        {
+                            item.Enabled = wkeCanGoBack(this.handle);
+                        }
+                        if (item.Text == "前进")
+                        {
+                            item.Enabled = wkeCanGoForward(this.handle);
+                        }
+                    }
+
+                }
+            }
         }
 
         void OnTitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title)
@@ -682,6 +719,12 @@ namespace MiniBlinkPinvoke
             }
         }
 
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.ResumeLayout(false);
+
+        }
     }
     public class JSFunctin : Attribute
     {

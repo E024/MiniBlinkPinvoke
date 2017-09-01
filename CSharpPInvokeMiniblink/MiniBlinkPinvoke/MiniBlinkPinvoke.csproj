@@ -67,6 +67,9 @@
     <Compile Include="TabCancelEventArgs.cs" />
     <Compile Include="TabEventArgs.cs" />
     <Compile Include="UnmanagedCodeSupplier.cs" />
+    <EmbeddedResource Include="BlinkBrowser.resx">
+      <DependentUpon>BlinkBrowser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

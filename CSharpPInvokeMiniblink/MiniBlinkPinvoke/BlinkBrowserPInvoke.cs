@@ -393,6 +393,9 @@ namespace MiniBlinkPinvoke
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeGoBack(IntPtr webView);
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorSelectAll(IntPtr webView);
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeGoForward(IntPtr webView);
