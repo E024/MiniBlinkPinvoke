@@ -63,11 +63,14 @@ namespace MiniBlinkPinvoke
                 string data = "<html><head><title>hook test</title></head><body><h1>hook!</h1></body></html>";
                 wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
                 wkeNetSetURL(job, url);
-                var dataByte = Encoding.UTF8.GetBytes(data);
-                IntPtr dataPtr = Marshal.AllocHGlobal(dataByte.Length);
-                Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, dataPtr, dataByte.Length);
-                wkeNetSetData(job, dataPtr, Encoding.UTF8.GetBytes(data).Length);
-                Marshal.Release(dataPtr);
+                //var dataByte = Encoding.UTF8.GetBytes(data);
+                //IntPtr dataPtr = Marshal.AllocHGlobal(dataByte.Length);
+                //Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, dataPtr, dataByte.Length);
+                //wkeNetSetData(job, dataPtr, Encoding.UTF8.GetBytes(data).Length);
+                //Marshal.Release(dataPtr);
+
+                wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.UTF8.GetBytes(data).Length);
+
                 return true;
             }
             else
