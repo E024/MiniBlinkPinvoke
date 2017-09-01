@@ -43,6 +43,14 @@ namespace MiniBlinkPinvoke
         static wkeDownloadFileCallback _wkeDownloadFileCallback;
         static wkeCreateViewCallback _wkeCreateViewCallback;
         static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
+        static wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
+
+
+        void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
+        {
+            Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
+        }
+
         bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
         {
             var _url = url;
@@ -103,8 +111,23 @@ namespace MiniBlinkPinvoke
            ControlStyles.ResizeRedraw |
            //  ControlStyles.EnableNotifyMessage|
            ControlStyles.UserPaint, true);
+            UpdateStyles();
+
+            MouseEnter += ((s, ea) =>
+            {
+                lock (LockObj)
+                {
+                    if (!this.Focused)
+                    {
+                        this.Focus();
+                    }
+                }
+            });
+
+
             GlobalObjectJs = this;
         }
+
         void OnTitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
             //Console.WriteLine(BlinkBrowserPInvoke.wkeGetStringW(title));
@@ -137,7 +160,7 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
             if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             {
-               Invalidate(new Rectangle(x, y, cx, cy), false);
+                Invalidate(new Rectangle(x, y, cx, cy), false);
                 //Invalidate();
 
 
@@ -222,10 +245,20 @@ namespace MiniBlinkPinvoke
                 //jsNativeFunction jsnav2 = new jsNativeFunction((es) =>
                 // {
                 //     Console.WriteLine("调用了 testJson");
-                //     return 0L;
+                //     return 0;
+                // });
+                //BlinkBrowserPInvoke.jsBindGetter("testChangeProp", jsnav2);
+                //jsNativeFunction jsnav3 = new jsNativeFunction((es) =>
+                // {
+                //     Console.WriteLine("调用了 testJson");
+                //     return 0;
                 // });
                 //BlinkBrowserPInvoke.jsBindSetter("testChangeProp", jsnav2);
-                //listObj.Add(jsnav2);
+                //listObj.Add(jsnav3);
+
+                _wkeLoadUrlEndCallback = OnwkeLoadUrlEndCallback;
+                BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
+                listObj.Add(_wkeLoadUrlEndCallback);
             }
         }
         //private void Timer_Tick(object sender, EventArgs e)
@@ -240,23 +273,21 @@ namespace MiniBlinkPinvoke
 
             if (handle != IntPtr.Zero)
             {
-                lock (LockObj)
-                {
-                    if (bits == IntPtr.Zero || oldSize != Size)
-                    {
-                        if (bits != IntPtr.Zero)
-                        {
-                            Marshal.FreeHGlobal(bits);
-                        }
-                        oldSize = Size;
-                        bits = Marshal.AllocHGlobal(Width * Height * 4);
-                    }
 
-                    BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
-                    using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
+                if (bits == IntPtr.Zero || oldSize != Size)
+                {
+                    if (bits != IntPtr.Zero)
                     {
-                        e.Graphics.DrawImage(bmp, 0, 0);
+                        Marshal.FreeHGlobal(bits);
                     }
+                    oldSize = Size;
+                    bits = Marshal.AllocHGlobal(Width * Height * 4);
+                }
+
+                BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
+                using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
+                {
+                    e.Graphics.DrawImage(bmp, 0, 0);
                 }
                 SetCursors();
             }
