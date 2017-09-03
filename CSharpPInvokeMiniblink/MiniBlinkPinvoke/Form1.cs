@@ -49,9 +49,10 @@ namespace MiniBlinkPinvoke
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "http://tests/getsource");
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
-            MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
 
-
+            //MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
+           
+            MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
         }
 
         private void Form1_Load(object sender, EventArgs e)

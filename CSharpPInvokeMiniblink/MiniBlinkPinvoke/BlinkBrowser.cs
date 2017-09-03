@@ -146,22 +146,47 @@ namespace MiniBlinkPinvoke
             contextMenuStrip.Opening += ContextMenuStrip1_Opening;
 
             ContextMenuStrip = contextMenuStrip;
-            ToolStripMenuItem tsmi = new ToolStripMenuItem("返回", null, (x, y) =>
+            ToolStripMenuItem tsmiGoBack = new ToolStripMenuItem("返回", null, (x, y) =>
             {
                 wkeGoBack(handle);
             });
-            ToolStripMenuItem tsmif = new ToolStripMenuItem("前进", null, (x, y) =>
+            ToolStripMenuItem tsmiForward = new ToolStripMenuItem("前进", null, (x, y) =>
             {
                 wkeGoForward(handle);
             });
-            ToolStripMenuItem tsmir = new ToolStripMenuItem("重新加载", null, (x, y) =>
+            ToolStripMenuItem tsmiReload = new ToolStripMenuItem("重新加载", null, (x, y) =>
             {
                 wkeReload(handle);
             });
+            ToolStripMenuItem tsmiSelectAll = new ToolStripMenuItem("全选", null, (x, y) =>
+            {
+                wkeSelectAll(handle);
+            });
+            ToolStripMenuItem tsmiCopy = new ToolStripMenuItem("复制", null, (x, y) =>
+            {
+                wkeCopy(handle);
+            });
+            ToolStripMenuItem tsmiCut = new ToolStripMenuItem("剪切", null, (x, y) =>
+            {
+                wkeCut(handle);
+            });
+            ToolStripMenuItem tsmiPaste = new ToolStripMenuItem("粘贴", null, (x, y) =>
+            {
+                wkePaste(handle);
+            });
+            ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("删除", null, (x, y) =>
+            {
+                wkeDelete(handle);
+            });
 
-            contextMenuStrip.Items.Add(tsmi);
-            contextMenuStrip.Items.Add(tsmif);
-            contextMenuStrip.Items.Add(tsmir);
+            contextMenuStrip.Items.Add(tsmiGoBack);
+            contextMenuStrip.Items.Add(tsmiForward);
+            contextMenuStrip.Items.Add(tsmiReload);
+            contextMenuStrip.Items.Add(tsmiSelectAll);
+            contextMenuStrip.Items.Add(tsmiCopy);
+            contextMenuStrip.Items.Add(tsmiCut);
+            contextMenuStrip.Items.Add(tsmiPaste);
+            contextMenuStrip.Items.Add(tsmiDelete);
 
             GlobalObjectJs = this;
         }
@@ -182,6 +207,10 @@ namespace MiniBlinkPinvoke
                         {
                             item.Enabled = wkeCanGoForward(this.handle);
                         }
+                        //if (item.Text == "全选")
+                        //{
+                        //    item.Enabled = wkeCanGoForward(this.handle);
+                        //}
                     }
 
                 }
@@ -245,6 +274,9 @@ namespace MiniBlinkPinvoke
                     MessageBox.Show(Marshal.PtrToStringAuto(b), "alert 调用");
                 });
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
+
+                //设置声音
+                BlinkBrowserPInvoke.wkeSetMediaVolume(handle, 20);
 
                 _wkeNavigationCallback = OnwkeNavigationCallback;
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);

@@ -130,6 +130,31 @@ namespace MiniBlinkPinvoke
         public static extern string wkeToStringW(IntPtr @string);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetString(IntPtr @string);
+
+
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSelectAll(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeCopy(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeCut(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkePaste(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeDelete(IntPtr webView);
+
+
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern float wkeMediaVolume(IntPtr webView);
+
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetMediaVolume(IntPtr webView, Single volume);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern Single wkeGetMediaVolume(IntPtr webView);
+
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern IntPtr wkeCreateStringW([In] [MarshalAs(UnmanagedType.LPWStr)] string @string,long len);
 
@@ -387,8 +412,6 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int wkeGetHeight(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern float wkeGetMediaVolume(IntPtr webView);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int wkeGetWidth(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern float wkeGetZoomFactor(IntPtr webView);
@@ -479,8 +502,6 @@ namespace MiniBlinkPinvoke
         public static extern void wkeReload(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetCookieEnabled(IntPtr webView, [MarshalAs(UnmanagedType.I1)] bool enable);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeSetMediaVolume(IntPtr webView, float volume);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetMenuItemText([In, MarshalAs(UnmanagedType.LPWStr)] string item, [In, MarshalAs(UnmanagedType.LPWStr)] string text);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
