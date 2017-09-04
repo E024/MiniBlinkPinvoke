@@ -200,6 +200,8 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 jsString(IntPtr es, IntPtr str);
 
+
+
         //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         //public static extern long wkeJSCallGlobal(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
 
@@ -435,6 +437,12 @@ namespace MiniBlinkPinvoke
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeIsLoadComplete(IntPtr webView);
+        [return: MarshalAs(UnmanagedType.I1)]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool wkeIsLoaded(IntPtr webView);
+        [return: MarshalAs(UnmanagedType.I1)]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool wkeIsLoadFailed(IntPtr webView);
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeIsLoading(IntPtr webView);

@@ -30,7 +30,8 @@ namespace MiniBlinkPinvoke
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
             //https://www.lyblog.net/detail/314.html
-            BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, textBox1.Text.Trim());
+            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, textBox1.Text.Trim());
+            blinkBrowser1.URL = textBox1.Text.Trim();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -51,8 +52,14 @@ namespace MiniBlinkPinvoke
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
 
             //MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
-           
-            MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
+
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
+
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoaded(blinkBrowser1.handle).ToString());
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoadFailed(blinkBrowser1.handle).ToString());
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoadComplete(blinkBrowser1.handle).ToString());
+            var cc = blinkBrowser1.GetCookiesByFile;
+
         }
 
         private void Form1_Load(object sender, EventArgs e)

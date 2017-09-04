@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -105,6 +106,7 @@ namespace MiniBlinkPinvoke
             }
             else
             {
+                _url = wkeGetString(url).IntptrToString();
                 Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).IntptrToString());
             }
         }
@@ -235,6 +237,23 @@ namespace MiniBlinkPinvoke
             return true;
         }
 
+        private string _url = string.Empty;
+        public string URL
+        {
+            get
+            {
+                return _url;
+            }
+            set
+            {
+                _url = value;
+                if (handle != IntPtr.Zero)
+                {
+                    wkeLoadURLW(this.handle, _url);
+                }
+            }
+        }
+
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
             Console.WriteLine("OnUrlChangedCallback:URL:" + wkeGetStringW(url));
@@ -267,6 +286,10 @@ namespace MiniBlinkPinvoke
                 //timer.Start();
                 BlinkBrowserPInvoke.wkeInitialize();
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
+
+                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
+                BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
+
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 BindJsFunc();
                 AlertBoxCallback = new AlertBoxCallback((a, b) =>
@@ -276,14 +299,13 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
                 //设置声音
-                BlinkBrowserPInvoke.wkeSetMediaVolume(handle, 20);
+                //BlinkBrowserPInvoke.wkeSetMediaVolume(handle, 20);
 
                 _wkeNavigationCallback = OnwkeNavigationCallback;
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
                 listObj.Add(_wkeNavigationCallback);
 
-                BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
-                //BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
+
 
                 //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
 
@@ -372,6 +394,43 @@ namespace MiniBlinkPinvoke
         //        Invalidate();
         //    }
         //}
+
+        public string GetCookiesByFile
+        {
+            get
+            {
+                StringBuilder sbCookie = new StringBuilder();
+                if (File.Exists("cookies.dat"))
+                {
+
+                    var uri = new Uri(URL);
+                    var host = uri.Host;
+                    var allCookies = File.ReadLines("cookies.dat").ToList();
+                    for (int i = 4; i < allCookies.Count(); i++)
+                    {
+                        var listCookie = allCookies[i].Split('\t');
+                        if (listCookie != null && listCookie.Count() != 0 && listCookie.Count() == 7)
+                        {
+                            if (listCookie[0] == host)
+                            {
+                                sbCookie.AppendFormat("{0}={1};",listCookie[5],listCookie[6]);
+                            }
+                            //httponly
+                            var httpOnly = "#HttpOnly_" + listCookie[0];
+                            if (listCookie[0] == httpOnly)
+                            {
+                                sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
+                            }
+                            //主域  ....
+                           // Lable
+                        }
+                    
+                    }
+                }
+                return sbCookie.ToString();
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
 
