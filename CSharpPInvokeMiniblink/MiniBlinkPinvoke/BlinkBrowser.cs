@@ -355,7 +355,6 @@ namespace MiniBlinkPinvoke
                     Int64 testJson = jsArg(es, 0);
                     IntPtr argStr = jsToStringW(es, testJson);
                     string argString = Marshal.PtrToStringUni(argStr);
-                    Marshal.FreeCoTaskMem(argStr);
                     //MessageBox.Show(argString, "alert setter");
 
                     return jsUndefined(es);
