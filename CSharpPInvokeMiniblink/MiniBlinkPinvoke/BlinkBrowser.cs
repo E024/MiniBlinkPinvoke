@@ -242,7 +242,7 @@ namespace MiniBlinkPinvoke
         }
         void OnTitleChangeCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
-            Console.WriteLine(Marshal.PtrToStringAnsi(title));
+            Console.WriteLine(Marshal.PtrToStringUni(title));
         }
 
         void OnWkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
@@ -272,7 +272,7 @@ namespace MiniBlinkPinvoke
                 BindJsFunc();
                 AlertBoxCallback = new AlertBoxCallback((a, b) =>
                 {
-                    MessageBox.Show(Marshal.PtrToStringAuto(b), "alert 调用");
+                    MessageBox.Show(Marshal.PtrToStringUni(b), "alert 调用");
                 });
                 BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
 
@@ -325,10 +325,10 @@ namespace MiniBlinkPinvoke
                 listObj.Add(_wkeLoadUrlBeginCallback);
 
                 #region JS 动态绑定，并返回值
-                jsNativeFunction jsnav = new jsNativeFunction((es) =>
+                wkeJsNativeFunction jsnav = new wkeJsNativeFunction((es, param) =>
                 {
                     string s = jsToString(es, jsArg(es, 0)).Utf8IntptrToString();
-                    IntPtr strPtr = Marshal.StringToCoTaskMemAnsi("这是C#返回值:" + s);
+                    IntPtr strPtr = Marshal.StringToCoTaskMemUni("这是C#返回值:" + s);
                     Int64 result = jsStringW(es, strPtr);
                     Marshal.FreeCoTaskMem(strPtr);
                     return result;
@@ -338,24 +338,25 @@ namespace MiniBlinkPinvoke
                 #endregion
 
                 // get
-                jsNativeFunction jsnavGet = new jsNativeFunction((es) =>
+                wkeJsNativeFunction jsnavGet = new wkeJsNativeFunction((es, param) =>
                 {
                     Console.WriteLine("call jsBindGetter");
-                    return jsStringW(es, Marshal.StringToCoTaskMemAnsi("{ \"name\": \"he\" }"));
+                    return jsStringW(es, Marshal.StringToCoTaskMemUni("{ \"name\": \"he\" }"));
                     //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).Utf8IntptrToString());
                 });
                 BlinkBrowserPInvoke.wkeJsBindGetter("testJson", jsnavGet, IntPtr.Zero);
                 listObj.Add(jsnavGet);
 
                 // set
-                jsNativeFunction jsnavSet = new jsNativeFunction((es) =>
+                wkeJsNativeFunction jsnavSet = new wkeJsNativeFunction((es, _param) =>
                 {
                     Console.WriteLine("call jsBindSetter");
 
                     Int64 testJson = jsArg(es, 0);
                     IntPtr argStr = jsToStringW(es, testJson);
                     string argString = Marshal.PtrToStringUni(argStr);
-                    MessageBox.Show(argString, "alert setter");
+                    Marshal.FreeCoTaskMem(argStr);
+                    //MessageBox.Show(argString, "alert setter");
 
                     return jsUndefined(es);
                 });
@@ -693,18 +694,18 @@ namespace MiniBlinkPinvoke
             //return Marshal.PtrToStringAnsi(xc);
         }
 
-        private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
+        //private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
         public void BindJsFunc()
         {
             var att = GlobalObjectJs.GetType().GetMethods();
-            jsnaviteList.Clear();
+            //jsnaviteList.Clear();
             var result = new ArrayList();
             foreach (var item in att)
             {
                 var xx = item.GetCustomAttributes(typeof(JSFunctin), true);
                 if (xx != null && xx.Length != 0)
                 {
-                    var jsnav = new jsNativeFunction((es) =>
+                    var jsnav = new wkeJsNativeFunction((es, _param) =>
                     {
                         var xp = item.GetParameters();
                         var argcount = BlinkBrowserPInvoke.jsArgCount(es);
@@ -757,8 +758,8 @@ namespace MiniBlinkPinvoke
                         }
                         return param;
                     });
-                    BlinkBrowserPInvoke.wkeJsBindFunction(item.Name, jsnav ,IntPtr.Zero, (uint)item.GetParameters().Length);
-                    jsnaviteList.Add(jsnav);
+                    BlinkBrowserPInvoke.wkeJsBindFunction(item.Name, jsnav, IntPtr.Zero, (uint)item.GetParameters().Length);
+                    listObj.Add(jsnav);
                 }
             }
         }
