@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace MiniBlinkPinvoke
 {
     public class JsValue
     {
         private IntPtr intptr_0;
-        private long long_0;
+        private Int64 long_0;
 
-        public JsValue(long value, IntPtr jsExecState)
+        public JsValue(Int64 value, IntPtr jsExecState)
         {
             this.long_0 = value;
             this.intptr_0 = jsExecState;
@@ -27,42 +28,45 @@ namespace MiniBlinkPinvoke
             return BlinkBrowserPInvoke.jsArgCount(jsExecState);
         }
 
-        public static long JsDouble(IntPtr jsExecState, double d)
+        public static Int64 JsDouble(IntPtr jsExecState, double d)
         {
             return BlinkBrowserPInvoke.jsDouble(jsExecState, d);
         }
 
-        public static long JsFalse(IntPtr jsExecState)
+        public static Int64 JsFalse(IntPtr jsExecState)
         {
             return BlinkBrowserPInvoke.jsFalse(jsExecState);
         }
 
-        public static long JsFloat(IntPtr jsExecState, float f)
+        public static Int64 JsFloat(IntPtr jsExecState, float f)
         {
             return BlinkBrowserPInvoke.jsFloat(jsExecState, f);
         }
 
-        public static long JsInt(IntPtr jsExecState, int n)
+        public static Int64 JsInt(IntPtr jsExecState, int n)
         {
             return BlinkBrowserPInvoke.jsInt(jsExecState, n);
         }
 
-        public static long JsNull(IntPtr jsExecState)
+        public static Int64 JsNull(IntPtr jsExecState)
         {
             return BlinkBrowserPInvoke.jsNull(jsExecState);
         }
 
-        public static long JsString(IntPtr jsExecState, string str)
+        public static Int64 JsString(IntPtr jsExecState, string str)
         {
-            return BlinkBrowserPInvoke.jsStringW(jsExecState, str);
+            IntPtr strPtr = Marshal.StringToCoTaskMemAnsi(str);
+            Int64 result = BlinkBrowserPInvoke.jsStringW(jsExecState, strPtr);
+            Marshal.FreeCoTaskMem(strPtr);
+            return result;
         }
 
-        public static long JsTrue(IntPtr jsExecState)
+        public static Int64 JsTrue(IntPtr jsExecState)
         {
             return BlinkBrowserPInvoke.jsTrue(jsExecState);
         }
 
-        public static long JsUndefined(IntPtr jsExecState)
+        public static Int64 JsUndefined(IntPtr jsExecState)
         {
             return BlinkBrowserPInvoke.jsUndefined(jsExecState);
         }
@@ -93,7 +97,7 @@ namespace MiniBlinkPinvoke
             {
                 return string.Empty;
             }
-            return BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0).IntptrToString();
+            return BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0).Utf8IntptrToString();
         }
 
         public wkeJSType JsType
@@ -104,7 +108,7 @@ namespace MiniBlinkPinvoke
             }
         }
 
-        public long Value
+        public Int64 Value
         {
             get
             {

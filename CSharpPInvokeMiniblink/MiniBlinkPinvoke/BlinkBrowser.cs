@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -47,11 +46,10 @@ namespace MiniBlinkPinvoke
         private System.ComponentModel.IContainer components;
         static wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
-
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
             Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
-            Console.WriteLine(buf.IntptrToString().Length);
+            Console.WriteLine(buf.Utf8IntptrToString().Length);
             //  Marshal.Release(buf);
         }
 
@@ -86,7 +84,7 @@ namespace MiniBlinkPinvoke
 
         IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
-            Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).IntptrToString());
+            Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).Utf8IntptrToString());
             Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
             return webView;
         }
@@ -98,39 +96,38 @@ namespace MiniBlinkPinvoke
 
         void OnwkeLoadingFinishCallback(IntPtr webView, IntPtr param, IntPtr url, wkeLoadingResult result, IntPtr failedReason)
         {
-            Console.WriteLine("call OnwkeLoadingFinishCallback:" + wkeGetString(url).IntptrToString());
+            Console.WriteLine("call OnwkeLoadingFinishCallback:" + wkeGetString(url).Utf8IntptrToString());
             Console.WriteLine("call OnwkeLoadingFinishCallback result:" + result);
             if (result == wkeLoadingResult.WKE_LOADING_FAILED)
             {
-                Console.WriteLine("call OnwkeLoadingFinishCallback 加载失败 failedReason:" + wkeGetString(failedReason).IntptrToString());
+                Console.WriteLine("call OnwkeLoadingFinishCallback 加载失败 failedReason:" + wkeGetString(failedReason).Utf8IntptrToString());
             }
             else
             {
-                _url = wkeGetString(url).IntptrToString();
-                Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).IntptrToString());
+                Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).Utf8IntptrToString());
             }
         }
         void OnwkeDocumentReadyCallback(IntPtr webView, IntPtr param)
         {
-            Console.WriteLine("call OnwkeDocumentReadyCallback:" + Marshal.PtrToStringUni(param));//.IntptrToString());
+            Console.WriteLine("call OnwkeDocumentReadyCallback:" + Marshal.PtrToStringUni(param));//.Utf8IntptrToString());
         }
         void OnwkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level, IntPtr message, IntPtr sourceName, int sourceLine, IntPtr stackTrace)
         {
             //Console.WriteLine("Console level" + level);
-            Console.WriteLine("Console Msg:" + wkeGetString(message).IntptrToString());
-            //Console.WriteLine("Console sourceName:" + wkeGetString(sourceName).IntptrToString());
-            //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).IntptrToString());
+            Console.WriteLine("Console Msg:" + wkeGetString(message).Utf8IntptrToString());
+            //Console.WriteLine("Console sourceName:" + wkeGetString(sourceName).Utf8IntptrToString());
+            //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).Utf8IntptrToString());
             //Console.WriteLine("Console sourceLine:" + sourceLine);
         }
         ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
         public BlinkBrowser()
         {
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
-      ControlStyles.DoubleBuffer |
-           ControlStyles.AllPaintingInWmPaint |
-           ControlStyles.ResizeRedraw |
-           //  ControlStyles.EnableNotifyMessage|
-           ControlStyles.UserPaint, true);
+                ControlStyles.DoubleBuffer |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.ResizeRedraw |
+                //  ControlStyles.EnableNotifyMessage|
+                ControlStyles.UserPaint, true);
             UpdateStyles();
 
             MouseEnter += ((s, ea) =>
@@ -228,30 +225,15 @@ namespace MiniBlinkPinvoke
         bool OnwkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
 
+            IntPtr urlPtr = BlinkBrowserPInvoke.wkeGetStringW(url);
             Console.WriteLine(navigationType);
-            Console.WriteLine("OnwkeNavigationCallback:URL:" + BlinkBrowserPInvoke.wkeGetStringW(url));
+
+            Console.WriteLine("OnwkeNavigationCallback:URL:" + Marshal.PtrToStringUni(urlPtr));
             //Console.WriteLine(Marshal.PtrToStringAnsi(url));
             //Console.WriteLine(Marshal.PtrToStringAuto(url));
             //Console.WriteLine(Marshal.PtrToStringBSTR(url));
             //Console.WriteLine(Marshal.PtrToStringUni(url));
             return true;
-        }
-
-        private string _url = string.Empty;
-        public string URL
-        {
-            get
-            {
-                return _url;
-            }
-            set
-            {
-                _url = value;
-                if (handle != IntPtr.Zero)
-                {
-                    wkeLoadURLW(this.handle, _url);
-                }
-            }
         }
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
@@ -270,10 +252,6 @@ namespace MiniBlinkPinvoke
             {
                 Invalidate(new Rectangle(x, y, cx, cy), false);
                 //Invalidate();
-
-
-
-
             }
         }
 
@@ -304,8 +282,6 @@ namespace MiniBlinkPinvoke
                 _wkeNavigationCallback = OnwkeNavigationCallback;
                 BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
                 listObj.Add(_wkeNavigationCallback);
-
-
 
                 //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
 
@@ -351,9 +327,13 @@ namespace MiniBlinkPinvoke
                 #region JS 动态绑定，并返回值
                 jsNativeFunction jsnav = new jsNativeFunction((es) =>
                 {
-                    return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
+                    string s = jsToString(es, jsArg(es, 0)).Utf8IntptrToString();
+                    IntPtr strPtr = Marshal.StringToCoTaskMemAnsi("这是C#返回值:" + s);
+                    Int64 result = jsStringW(es, strPtr);
+                    Marshal.FreeCoTaskMem(strPtr);
+                    return result;
                 });
-                BlinkBrowserPInvoke.jsBindFunction("jsReturnValueTest", jsnav, 1);
+                BlinkBrowserPInvoke.wkeJsBindFunction("jsReturnValueTest", jsnav, IntPtr.Zero, 1);
                 listObj.Add(jsnav);
                 #endregion
 
@@ -361,10 +341,10 @@ namespace MiniBlinkPinvoke
                 jsNativeFunction jsnavGet = new jsNativeFunction((es) =>
                 {
                     Console.WriteLine("call jsBindGetter");
-                    return jsStringW(es, "{ \"name\": \"he\" }");
-                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).IntptrToString());
+                    return jsStringW(es, Marshal.StringToCoTaskMemAnsi("{ \"name\": \"he\" }"));
+                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).Utf8IntptrToString());
                 });
-                BlinkBrowserPInvoke.jsBindGetter("testJson", jsnavGet);
+                BlinkBrowserPInvoke.wkeJsBindGetter("testJson", jsnavGet, IntPtr.Zero);
                 listObj.Add(jsnavGet);
 
                 // set
@@ -379,7 +359,7 @@ namespace MiniBlinkPinvoke
 
                     return jsUndefined(es);
                 });
-                BlinkBrowserPInvoke.jsBindSetter("testJson", jsnavSet);
+                BlinkBrowserPInvoke.wkeJsBindSetter("testJson", jsnavSet, IntPtr.Zero);
                 listObj.Add(jsnavSet);
 
                 _wkeLoadUrlEndCallback = OnwkeLoadUrlEndCallback;
@@ -394,43 +374,6 @@ namespace MiniBlinkPinvoke
         //        Invalidate();
         //    }
         //}
-
-        public string GetCookiesByFile
-        {
-            get
-            {
-                StringBuilder sbCookie = new StringBuilder();
-                if (File.Exists("cookies.dat"))
-                {
-
-                    var uri = new Uri(URL);
-                    var host = uri.Host;
-                    var allCookies = File.ReadLines("cookies.dat").ToList();
-                    for (int i = 4; i < allCookies.Count(); i++)
-                    {
-                        var listCookie = allCookies[i].Split('\t');
-                        if (listCookie != null && listCookie.Count() != 0 && listCookie.Count() == 7)
-                        {
-                            if (listCookie[0] == host)
-                            {
-                                sbCookie.AppendFormat("{0}={1};",listCookie[5],listCookie[6]);
-                            }
-                            //httponly
-                            var httpOnly = "#HttpOnly_" + listCookie[0];
-                            if (listCookie[0] == httpOnly)
-                            {
-                                sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
-                            }
-                            //主域  ....
-                           // Lable
-                        }
-                    
-                    }
-                }
-                return sbCookie.ToString();
-            }
-        }
-
         protected override void OnPaint(PaintEventArgs e)
         {
 
@@ -734,8 +677,10 @@ namespace MiniBlinkPinvoke
 
         public JsValue InvokeJS(string js)
         {
-
-            return new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), BlinkBrowserPInvoke.wkeGlobalExec(handle));
+            IntPtr jsPtr = Marshal.StringToCoTaskMemAnsi(js);
+            JsValue result = new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, jsPtr), BlinkBrowserPInvoke.wkeGlobalExec(handle));
+            Marshal.FreeCoTaskMem(jsPtr);
+            return result;
             //Marshal.SecureStringToGlobalAllocAnsi(js)
             //return new JsValue(EwePInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), EwePInvoke.wkeGlobalExec(handle));
         }
@@ -747,8 +692,6 @@ namespace MiniBlinkPinvoke
             //return new JsValue(xc, EwePInvoke.wkeGlobalExec(handle)).ToString();
             //return Marshal.PtrToStringAnsi(xc);
         }
-
-
 
         private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
         public void BindJsFunc()
@@ -797,7 +740,7 @@ namespace MiniBlinkPinvoke
                                 }
                                 else
                                 {
-                                    listParam[i] = Convert.ChangeType((BlinkBrowserPInvoke.jsToString(es, paramnow)).IntptrToString(), tType);
+                                    listParam[i] = Convert.ChangeType((BlinkBrowserPInvoke.jsToString(es, paramnow)).Utf8IntptrToString(), tType);
                                 }
                             }
                             try
@@ -814,7 +757,7 @@ namespace MiniBlinkPinvoke
                         }
                         return param;
                     });
-                    BlinkBrowserPInvoke.jsBindFunction(item.Name, jsnav, (uint)item.GetParameters().Length);
+                    BlinkBrowserPInvoke.wkeJsBindFunction(item.Name, jsnav ,IntPtr.Zero, (uint)item.GetParameters().Length);
                     jsnaviteList.Add(jsnav);
                 }
             }

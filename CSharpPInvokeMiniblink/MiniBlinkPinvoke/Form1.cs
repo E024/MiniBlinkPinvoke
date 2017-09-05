@@ -30,13 +30,12 @@ namespace MiniBlinkPinvoke
             //EwePInvoke.wkeLoadURLW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
             //https://www.lyblog.net/detail/314.html
-            //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, textBox1.Text.Trim());
-            blinkBrowser1.URL = textBox1.Text.Trim();
+            BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, textBox1.Text.Trim());
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show(BlinkBrowserPInvoke.wkeGetVersionString());
+            MessageBox.Show(BlinkBrowserPInvoke.wkeGetVersionString().Utf8IntptrToString());
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.body.innerHTML").ToString());
             //EwePInvoke.wkeLoadURL(blinkBrowser1.handle, Marshal.StringToHGlobalUni("file:///MiniBlinkPinvoke/index.html"));
             //EwePInvoke.wkeLoadFileW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
@@ -51,15 +50,9 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
 
-            //MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).IntptrToString());
-
+           MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).Utf8IntptrToString());
+           
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
-
-            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoaded(blinkBrowser1.handle).ToString());
-            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoadFailed(blinkBrowser1.handle).ToString());
-            //MessageBox.Show(BlinkBrowserPInvoke.wkeIsLoadComplete(blinkBrowser1.handle).ToString());
-            var cc = blinkBrowser1.GetCookiesByFile;
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -72,7 +65,7 @@ namespace MiniBlinkPinvoke
 
         private void blinkBrowser1_OnTitleChangeCall(IntPtr webView, IntPtr param, IntPtr title)
         {
-            Text = BlinkBrowserPInvoke.wkeGetString(title).IntptrToString();
+            Text = BlinkBrowserPInvoke.wkeGetString(title).Utf8IntptrToString();
         }
 
         private void button3_Click(object sender, EventArgs e)
