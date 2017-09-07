@@ -78,5 +78,22 @@ namespace MiniBlinkPinvoke
 
         public wkeJSCallAsFunctionCallback callAsFunction;
     }
-
+    [StructLayout(LayoutKind.Sequential)]
+    public struct wkeProxy
+    {
+        public wkeProxyType type;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
+        public string hostname;
+        public ushort port;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
+        public string username;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
+        public string password;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct wkeSettings
+    {
+        public wkeProxy proxy;
+        public uint mask;
+    }
 }

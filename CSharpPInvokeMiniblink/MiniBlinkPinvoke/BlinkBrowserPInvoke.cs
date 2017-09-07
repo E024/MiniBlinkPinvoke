@@ -445,6 +445,13 @@ namespace MiniBlinkPinvoke
         public static extern bool wkeGoForward(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeInitialize();
+        
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeInitializeEx(wkeSettings settings);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeConfigure(wkeSettings settings);
+
+
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeIsCookieEnabled(IntPtr webView);

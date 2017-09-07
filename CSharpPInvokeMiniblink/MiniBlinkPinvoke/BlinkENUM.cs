@@ -5,6 +5,15 @@ using System.Text;
 
 namespace MiniBlinkPinvoke
 {
+    public enum wkeProxyType
+    {
+        WKE_PROXY_NONE,
+        WKE_PROXY_HTTP,
+        WKE_PROXY_SOCKS4,
+        WKE_PROXY_SOCKS4A,
+        WKE_PROXY_SOCKS5,
+        WKE_PROXY_SOCKS5HOSTNAME
+    }
     public enum wkeMouseMessage : uint
     {
         WKE_MSG_MOUSEMOVE = 0x0200,
@@ -65,7 +74,8 @@ namespace MiniBlinkPinvoke
         WKE_MESSAGE_LEVEL_ERROR,
         WKE_MESSAGE_LEVEL_DEBUG
     }
-    public enum wkeConsoleLevel {
+    public enum wkeConsoleLevel
+    {
         wkeLevelDebug = 4,
         wkeLevelLog = 1,
         wkeLevelInfo = 5,
