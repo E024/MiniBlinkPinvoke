@@ -281,6 +281,8 @@ namespace MiniBlinkPinvoke
 
 
                 //BlinkBrowserPInvoke.wkeInitialize();
+
+
                 BlinkBrowserPInvoke.wkeInitializeEx(new wkeSettings()
                 {
                     proxy = new wkeProxy
@@ -294,7 +296,6 @@ namespace MiniBlinkPinvoke
                     mask = 1
                 });
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
-
                 BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
                 BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
 
