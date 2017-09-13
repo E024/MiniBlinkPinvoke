@@ -447,10 +447,28 @@ namespace MiniBlinkPinvoke
         public static extern void wkeInitialize();
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeInitializeEx(wkeSettings settings);
-        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeConfigure(wkeSettings settings);
+        public static extern void wkeInitializeEx(IntPtr settings);
 
+        public static void wkeInitializeExWrap(wkeSettings settings)
+        {
+            int nSizeOfSettings = Marshal.SizeOf(settings);
+            IntPtr intPtr = Marshal.AllocHGlobal(nSizeOfSettings);
+            Marshal.StructureToPtr(settings, intPtr, true);
+            BlinkBrowserPInvoke.wkeInitializeEx(intPtr);
+            Marshal.DestroyStructure(intPtr, typeof(wkeSettings));
+        }
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeConfigure(IntPtr settings); // wkeSettings
+
+        public static void wkeConfigureWrap(wkeSettings settings)
+        {
+            int nSizeOfSettings = Marshal.SizeOf(settings);
+            IntPtr intPtr = Marshal.AllocHGlobal(nSizeOfSettings);
+            Marshal.StructureToPtr(settings, intPtr, true);
+            BlinkBrowserPInvoke.wkeConfigure(intPtr);
+            Marshal.DestroyStructure(intPtr, typeof(wkeSettings));
+        }
 
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
