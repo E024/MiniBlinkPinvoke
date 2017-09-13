@@ -280,32 +280,32 @@ namespace MiniBlinkPinvoke
                 //});
 
 
-                //BlinkBrowserPInvoke.wkeInitialize();
+                BlinkBrowserPInvoke.wkeInitialize();
 
 
-                BlinkBrowserPInvoke.wkeInitializeEx(new wkeSettings()
-                {
-                    proxy = new wkeProxy
-                    {
-                        hostname = "127.0.0.1",
-                        port = 8888,
-                        type = wkeProxyType.WKE_PROXY_HTTP,
-                        password = "",
-                        username = ""
-                    },
-                    mask = 1
-                });
+                //BlinkBrowserPInvoke.wkeInitializeEx(new wkeSettings()
+                //{
+                //    proxy = new wkeProxy
+                //    {
+                //        hostname = "127.0.0.1",
+                //        port = 8888,
+                //        type = wkeProxyType.WKE_PROXY_HTTP,
+                //        password = "",
+                //        username = ""
+                //    },
+                //    mask = 1
+                //});
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
                 BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
                 BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
 
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 BindJsFunc();
-                AlertBoxCallback = new AlertBoxCallback((a, b) =>
-                {
-                    MessageBox.Show(Marshal.PtrToStringUni(b), "alert 调用");
-                });
-                BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback);
+                //AlertBoxCallback = new AlertBoxCallback((a, b, c) =>
+                //{
+                //    MessageBox.Show(Marshal.PtrToStringUni(c), "alert 调用aa");
+                //});
+                //BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback, IntPtr.Zero);
 
                 //设置声音
                 //BlinkBrowserPInvoke.wkeSetMediaVolume(handle, 20);
@@ -342,7 +342,7 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
                 listObj.Add(_wkeLoadingFinishCallback);
 
-                ////会导致 taobao 加载图片异常
+                // //会导致 taobao 加载图片异常
                 //_wkeDownloadFileCallback = OnwkeDownloadFileCallback;
                 //BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
                 //listObj.Add(_wkeDownloadFileCallback);

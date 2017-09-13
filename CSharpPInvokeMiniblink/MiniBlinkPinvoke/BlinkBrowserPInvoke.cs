@@ -337,7 +337,7 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 wkeRunJSW(IntPtr webView, [In] [MarshalAs(UnmanagedType.LPWStr)] string script);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeOnAlertBox(IntPtr webView, AlertBoxCallback callback);
+        public static extern void wkeOnAlertBox(IntPtr webView, AlertBoxCallback callback, IntPtr callbackParam);
         /// <summary>
         /// 下载回调
         /// </summary>
@@ -445,7 +445,7 @@ namespace MiniBlinkPinvoke
         public static extern bool wkeGoForward(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeInitialize();
-        
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeInitializeEx(wkeSettings settings);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]

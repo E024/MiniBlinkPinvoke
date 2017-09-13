@@ -16,7 +16,7 @@ namespace MiniBlinkPinvoke
     public delegate void wkeJSFinalizeCallback(ref wkeJSData data);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate long wkeJSCallAsFunctionCallback(IntPtr es, long @object, ref long args, int argCount);
-    public delegate void AlertBoxCallback(IntPtr webView, IntPtr msg);
+    public delegate void AlertBoxCallback(IntPtr webView, IntPtr param, IntPtr msg);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool ConfirmBoxCallback(IntPtr webView, IntPtr msg);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
