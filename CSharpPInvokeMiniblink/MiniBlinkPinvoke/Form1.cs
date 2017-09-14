@@ -51,17 +51,13 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
 
-           MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).Utf8IntptrToString());
-           
+            MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).Utf8IntptrToString());
+            MessageBox.Show(blinkBrowser1.GetCookiesFromFile);
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (File.Exists("cookies.dat"))
-            {
-                File.Delete("cookies.dat");
-            }
             blinkBrowser1.OnUrlChangeCall += BlinkBrowser1_OnUrlChangeCall;
         }
 

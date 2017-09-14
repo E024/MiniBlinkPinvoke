@@ -17,6 +17,8 @@ namespace MiniBlinkPinvoke
     {
 
 
+        string CookiePath { get; set; }
+
         public IntPtr handle = IntPtr.Zero;
         //Timer timer = new Timer { Interval = 25 };
         string url = string.Empty;
@@ -299,7 +301,12 @@ namespace MiniBlinkPinvoke
 
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
                 BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
-                BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, Application.StartupPath + "\\cookie\\");
+                CookiePath = Application.StartupPath + "\\cookie\\";
+                if (!Directory.Exists(CookiePath))
+                {
+                    Directory.CreateDirectory(CookiePath);
+                }
+                BlinkBrowserPInvoke.wkeSetCookieJarPath(handle, CookiePath);
 
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 BindJsFunc();
@@ -828,19 +835,21 @@ namespace MiniBlinkPinvoke
 
         }
 
-
-        public string GetCookiesByFile
+        /// <summary>
+        /// 解析 cookies.dat文件得到Cookie,没有判断 path，只有 域的判断
+        /// </summary>
+        public string GetCookiesFromFile
         {
             get
             {
                 StringBuilder sbCookie = new StringBuilder();
-                if (File.Exists("cookies.dat"))
+                if (File.Exists(CookiePath + "\\cookies.dat"))
                 {
 
-                    var uri = new Uri("http://dec.sztaizhou.com/view/business2/Biz2Default.aspx");
+                    var uri = new Uri(Url);
                     var host = uri.Host;
 
-                    var allCookies = File.ReadLines("cookies.dat").ToList();
+                    var allCookies = File.ReadLines(CookiePath + "\\cookies.dat").ToList();
                     for (int i = 4; i < allCookies.Count(); i++)
                     {
                         host = uri.Host;
