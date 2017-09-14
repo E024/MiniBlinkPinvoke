@@ -270,10 +270,10 @@ namespace MiniBlinkPinvoke
                 //timer.Tick += Timer_Tick;
                 //timer.Start();
 
-                //BlinkBrowserPInvoke.wkeInitialize();
+                BlinkBrowserPInvoke.wkeInitialize();
 
 
-                //BlinkBrowserPInvoke.wkeConfigure(new wkeSettings()
+                //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
                 //{
                 //    proxy = new wkeProxy
                 //    {
@@ -283,9 +283,9 @@ namespace MiniBlinkPinvoke
                 //        password = "",
                 //        username = ""
                 //    },
-                //    mask = 1
+                //    mask = wkeSettingMask.WKE_SETTING_PAINTCALLBACK_IN_OTHER_THREAD
                 //});
-                BlinkBrowserPInvoke.wkeInitialize();
+                //BlinkBrowserPInvoke.wkeInitialize();
                 //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
                 //{
                 //    proxy = new wkeProxy

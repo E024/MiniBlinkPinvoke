@@ -14,6 +14,11 @@ namespace MiniBlinkPinvoke
         WKE_PROXY_SOCKS5,
         WKE_PROXY_SOCKS5HOSTNAME
     }
+    public enum wkeSettingMask
+    {
+        WKE_SETTING_PROXY = 1,
+        WKE_SETTING_PAINTCALLBACK_IN_OTHER_THREAD = 1 << 2,
+    }
     public enum wkeMouseMessage : uint
     {
         WKE_MSG_MOUSEMOVE = 0x0200,

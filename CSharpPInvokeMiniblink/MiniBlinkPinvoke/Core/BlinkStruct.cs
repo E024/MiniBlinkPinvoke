@@ -94,6 +94,6 @@ namespace MiniBlinkPinvoke
     public struct wkeSettings
     {
         public wkeProxy proxy;
-        public uint mask;
+        public wkeSettingMask mask;
     }
 }
