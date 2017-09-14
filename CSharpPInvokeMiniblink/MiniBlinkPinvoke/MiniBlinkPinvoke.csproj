@@ -64,6 +64,8 @@
     <Compile Include="JsValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RECT.cs" />
+    <Compile Include="ScreenCameraClass.cs" />
     <Compile Include="TabCancelEventArgs.cs" />
     <Compile Include="TabEventArgs.cs" />
     <Compile Include="UnmanagedCodeSupplier.cs" />

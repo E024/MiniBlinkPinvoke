@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,7 +28,9 @@ namespace MiniBlinkPinvoke
 
 
         public event TitleChangedCallback OnTitleChangeCall;
-
+        // 
+        public delegate void URLChange(string url);
+        public event URLChange OnUrlChangeCall;
         //public event wkeDocumentReadyCallback DocumentReadyCallback;
 
         List<object> listObj = new List<object>();
@@ -104,6 +107,8 @@ namespace MiniBlinkPinvoke
             }
             else
             {
+                this.url = wkeGetString(url).Utf8IntptrToString();
+                OnUrlChangeCall?.Invoke(Url);
                 Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).Utf8IntptrToString());
             }
         }
@@ -278,19 +283,19 @@ namespace MiniBlinkPinvoke
                 //    },
                 //    mask = 1
                 //});
-
-                BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
-                {
-                    proxy = new wkeProxy
-                    {
-                        hostname = "127.0.0.1",
-                        port = 8888,
-                        type = wkeProxyType.WKE_PROXY_HTTP,
-                        password = "",
-                        username = ""
-                    },
-                    mask = 1
-                });
+                BlinkBrowserPInvoke.wkeInitialize();
+                //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
+                //{
+                //    proxy = new wkeProxy
+                //    {
+                //        hostname = "127.0.0.1",
+                //        port = 8888,
+                //        type = wkeProxyType.WKE_PROXY_HTTP,
+                //        password = "",
+                //        username = ""
+                //    },
+                //    mask = 1
+                //});
 
                 handle = BlinkBrowserPInvoke.wkeCreateWebView();
                 BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
@@ -821,6 +826,72 @@ namespace MiniBlinkPinvoke
             this.SuspendLayout();
             this.ResumeLayout(false);
 
+        }
+
+
+        public string GetCookiesByFile
+        {
+            get
+            {
+                StringBuilder sbCookie = new StringBuilder();
+                if (File.Exists("cookies.dat"))
+                {
+
+                    var uri = new Uri("http://dec.sztaizhou.com/view/business2/Biz2Default.aspx");
+                    var host = uri.Host;
+
+                    var allCookies = File.ReadLines("cookies.dat").ToList();
+                    for (int i = 4; i < allCookies.Count(); i++)
+                    {
+                        host = uri.Host;
+                        var listCookie = allCookies[i].Split('\t');
+                        if (listCookie != null && listCookie.Count() != 0 && listCookie.Count() == 7)
+                        {
+                            var _cookie = listCookie[0];
+
+                            Lable:
+                            if (_cookie == host)
+                            {
+                                sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
+                            }
+                            //httponly
+                            var httpOnly = "#HttpOnly_" + host;
+                            if (_cookie == httpOnly)
+                            {
+                                sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
+                            }
+                            if (host.IndexOf('.') == 0)// . 开头
+                            {
+                                host = host.Substring(host.IndexOf('.') + 1);//. 开头 去掉 .
+                                goto Lable;
+                            }
+                            else
+                            {
+                                if (host.TrimStart('.').Split('.').Length > 2)
+                                {
+                                    host = host.Substring(host.IndexOf('.'));//带 . 
+                                    goto Lable;
+                                }
+                            }
+                        }
+
+                    }
+                }
+                return sbCookie.ToString();
+            }
+        }
+
+        public string Url
+        {
+            get => url;
+            set
+            {
+                url = value;
+                if (handle != IntPtr.Zero)
+                {
+                    BlinkBrowserPInvoke.wkeLoadURLW(handle, url);
+                }
+            }
         }
     }
     public class JSFunctin : Attribute

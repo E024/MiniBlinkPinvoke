@@ -31,6 +31,7 @@ namespace MiniBlinkPinvoke
             //BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, "https://www.baidu.com/");
             //https://www.lyblog.net/detail/314.html
             BlinkBrowserPInvoke.wkeLoadURLW(blinkBrowser1.handle, textBox1.Text.Trim());
+
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -61,6 +62,12 @@ namespace MiniBlinkPinvoke
             {
                 File.Delete("cookies.dat");
             }
+            blinkBrowser1.OnUrlChangeCall += BlinkBrowser1_OnUrlChangeCall;
+        }
+
+        private void BlinkBrowser1_OnUrlChangeCall(string url)
+        {
+            textBox1.Text = url;
         }
 
         private void blinkBrowser1_OnTitleChangeCall(IntPtr webView, IntPtr param, IntPtr title)
