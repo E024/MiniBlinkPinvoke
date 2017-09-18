@@ -36,7 +36,7 @@ namespace MiniBlinkPinvoke
 
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(BlinkBrowserPInvoke.wkeGetVersionString().Utf8IntptrToString());
+            //MessageBox.Show(BlinkBrowserPInvoke.wkeGetVersionString().Utf8IntptrToString());
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.body.innerHTML").ToString());
             //EwePInvoke.wkeLoadURL(blinkBrowser1.handle, Marshal.StringToHGlobalUni("file:///MiniBlinkPinvoke/index.html"));
             //EwePInvoke.wkeLoadFileW(blinkBrowser1.handle, "file:///MiniBlinkPinvoke/index.html");
@@ -51,9 +51,23 @@ namespace MiniBlinkPinvoke
             //Console.WriteLine(blinkBrowser1.InvokeJSW("return document.cookie").ToString());
             //var hax= BlinkBrowserPInvoke.wkeRunJS(blinkBrowser1.handle, Marshal.StringToHGlobalAnsi("return testInt();"));
 
-            MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).Utf8IntptrToString());
-            MessageBox.Show(blinkBrowser1.GetCookiesFromFile);
+            //MessageBox.Show(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetCookie(blinkBrowser1.handle).Utf8IntptrToString());
+            //MessageBox.Show(blinkBrowser1.GetCookiesFromFile);
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
+
+
+            BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
+            {
+                proxy = new wkeProxy
+                {
+                    hostname = "",
+                    port = 8888,
+                    type = wkeProxyType.WKE_PROXY_HTTP,
+                    password = "",
+                    username = ""
+                },
+                mask = wkeSettingMask.WKE_SETTING_PROXY
+            });
         }
 
         private void Form1_Load(object sender, EventArgs e)

@@ -270,21 +270,21 @@ namespace MiniBlinkPinvoke
                 //timer.Tick += Timer_Tick;
                 //timer.Start();
 
-                BlinkBrowserPInvoke.wkeInitialize();
+                //BlinkBrowserPInvoke.wkeInitialize();
 
 
-                //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
-                //{
-                //    proxy = new wkeProxy
-                //    {
-                //        hostname = "127.0.0.1",
-                //        port = 8888,
-                //        type = wkeProxyType.WKE_PROXY_HTTP,
-                //        password = "",
-                //        username = ""
-                //    },
-                //    mask = wkeSettingMask.WKE_SETTING_PAINTCALLBACK_IN_OTHER_THREAD
-                //});
+                BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
+                {
+                    proxy = new wkeProxy
+                    {
+                        hostname = "127.0.0.1",
+                        port = 8888,
+                        type = wkeProxyType.WKE_PROXY_HTTP,
+                        password = "",
+                        username = ""
+                    },
+                    mask = wkeSettingMask.WKE_SETTING_PROXY
+                });
                 //BlinkBrowserPInvoke.wkeInitialize();
                 //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
                 //{
