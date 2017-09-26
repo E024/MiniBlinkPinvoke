@@ -254,12 +254,36 @@ namespace MiniBlinkPinvoke
 
         void OnWkePaintUpdatedCallback(IntPtr webView, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
         {
-            //Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
-            if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
-            {
-                Invalidate(new Rectangle(x, y, cx, cy), false);
-                //Invalidate();
-            }
+            ////Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
+            //if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
+            //{
+            Invalidate(new Rectangle(x, y, cx, cy), false);
+            #region 从 hdc 中取图像 开启这个可以取消 OnPaint 重写，但感觉页面有卡顿
+            ////lock (LockObj)
+            ////{
+            ////    GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
+            ////    ClearMemory();
+            ////}
+            #endregion
+            //Invalidate();
+            //Graphics dc = Graphics.FromHdc(hdc);
+            //if (bits == IntPtr.Zero || oldSize != Size)
+            //{
+            //    if (bits != IntPtr.Zero)
+            //    {
+            //        Marshal.FreeHGlobal(bits);
+            //    }
+            //    oldSize = Size;
+            //    bits = Marshal.AllocHGlobal(Width * Height * 4);
+            //}
+
+            //BlinkBrowserPInvoke.wkePaint(handle, bits, 0);
+            //using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
+            //{
+
+            //    dc.DrawImage(bmp, 0, 0);
+            //}
+            //}
         }
 
         protected override void OnCreateControl()
@@ -270,21 +294,21 @@ namespace MiniBlinkPinvoke
                 //timer.Tick += Timer_Tick;
                 //timer.Start();
 
-                //BlinkBrowserPInvoke.wkeInitialize();
+                BlinkBrowserPInvoke.wkeInitialize();
 
 
-                BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
-                {
-                    proxy = new wkeProxy
-                    {
-                        hostname = "127.0.0.1",
-                        port = 8888,
-                        type = wkeProxyType.WKE_PROXY_HTTP,
-                        password = "",
-                        username = ""
-                    },
-                    mask = wkeSettingMask.WKE_SETTING_PROXY
-                });
+                //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
+                //{
+                //    proxy = new wkeProxy
+                //    {
+                //        hostname = "127.0.0.1",
+                //        port = 8888,
+                //        type = wkeProxyType.WKE_PROXY_HTTP,
+                //        password = "",
+                //        username = ""
+                //    },
+                //    mask = wkeSettingMask.WKE_SETTING_PROXY
+                //});
                 //BlinkBrowserPInvoke.wkeInitialize();
                 //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
                 //{
@@ -405,7 +429,12 @@ namespace MiniBlinkPinvoke
                 _wkeLoadUrlEndCallback = OnwkeLoadUrlEndCallback;
                 BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
                 listObj.Add(_wkeLoadUrlEndCallback);
+
+
             }
+
+
+
         }
         //private void Timer_Tick(object sender, EventArgs e)
         //{
@@ -434,6 +463,8 @@ namespace MiniBlinkPinvoke
                 using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
                 {
                     e.Graphics.DrawImage(bmp, 0, 0);
+                    //e.Graphics.DrawImage()
+
                 }
                 SetCursors();
             }
@@ -450,6 +481,7 @@ namespace MiniBlinkPinvoke
             //Application.DoEvents();
             //GC.Collect();
         }
+
         void SetCursors()
         {
             //Console.WriteLine("wkeGetCursorInfoType:  " + BlinkBrowserPInvoke.wkeGetCursorInfoType(handle));
@@ -907,4 +939,6 @@ namespace MiniBlinkPinvoke
     {
         public JSFunctin() { }
     }
+
+
 }
