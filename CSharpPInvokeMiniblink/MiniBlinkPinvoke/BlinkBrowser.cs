@@ -48,6 +48,7 @@ namespace MiniBlinkPinvoke
         static wkeDownloadFileCallback _wkeDownloadFileCallback;
         static wkeCreateViewCallback _wkeCreateViewCallback;
         static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
+        private static ReadFileCallback readFileCallback;
         private System.ComponentModel.IContainer components;
         static wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
@@ -96,7 +97,7 @@ namespace MiniBlinkPinvoke
         bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
         {
             Console.WriteLine("call OnwkeDownloadFileCallback:" + (url));
-            return true;
+            return false;
         }
 
         void OnwkeLoadingFinishCallback(IntPtr webView, IntPtr param, IntPtr url, wkeLoadingResult result, IntPtr failedReason)
@@ -375,10 +376,10 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
                 listObj.Add(_wkeLoadingFinishCallback);
 
-                // //会导致 taobao 加载图片异常
-                //_wkeDownloadFileCallback = OnwkeDownloadFileCallback;
-                //BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
-                //listObj.Add(_wkeDownloadFileCallback);
+                //会导致 taobao 加载图片异常
+                _wkeDownloadFileCallback = OnwkeDownloadFileCallback;
+                BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
+                listObj.Add(_wkeDownloadFileCallback);
 
                 _wkeCreateViewCallback = OnwkeCreateViewCallback;
                 BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
@@ -430,7 +431,9 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
                 listObj.Add(_wkeLoadUrlEndCallback);
 
-
+                readFileCallback = new ReadFileCallback(LoadMemoryData);
+                wkeOnReadFile(readFileCallback);
+                listObj.Add(readFileCallback);
             }
 
 

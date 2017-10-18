@@ -18,7 +18,7 @@ namespace MiniBlinkPinvoke
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
 
-        private static ReadFileCallback readFileCallback;
+      
         private static OnDidDownloadCallback didDownloadCallback_2;
         private static OnDidDownloadCallback didDownloadCallback_1;
         private static OnDidDownloadCallback didDownloadCallback_0;
@@ -34,8 +34,7 @@ namespace MiniBlinkPinvoke
             //{
             //wkeDisableWOFF(false);
             //}
-            //readFileCallback = new ReadFileCallback(LoadMemoryData);
-            //wkeOnReadFile(readFileCallback);
+       
             //if (didDownloadCallback_2 == null)
             //{
             //    didDownloadCallback_2 = new OnDidDownloadCallback(DownloadCallback);
@@ -66,8 +65,7 @@ namespace MiniBlinkPinvoke
         public static string PageNameSpace { get; set; }
         private static Func<string, byte[]> func;
         private static Dictionary<string, Assembly> dicResourcesAssembly = new Dictionary<string, Assembly>();
-
-        private static void LoadMemoryData(IntPtr intptr, string url, SetDataCallback setDataCallback)
+        public static void LoadMemoryData(IntPtr intptr, string url, SetDataCallback setDataCallback)
         {
             byte[] buffer;
             IntPtr ptr;
