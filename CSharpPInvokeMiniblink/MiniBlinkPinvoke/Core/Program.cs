@@ -13,10 +13,7 @@ namespace MiniBlinkPinvoke
         [STAThread]
         static void Main()
         {
-            //WKE_SETTING_PROXY = 1,
-            //var x = 1 << 2;
             Application.SetCompatibleTextRenderingDefault(false);
-            MiniBlinkPinvoke.BlinkBrowserPInvoke.ResourceAssemblys.Add("MiniBlinkPinvoke", System.Reflection.Assembly.GetExecutingAssembly());
             Application.Run(new Form1());
         }
     }

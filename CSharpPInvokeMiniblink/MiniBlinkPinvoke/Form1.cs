@@ -56,18 +56,21 @@ namespace MiniBlinkPinvoke
             //MessageBox.Show(BlinkBrowserPInvoke.wkeGetMediaVolume(blinkBrowser1.handle).ToString());
 
 
-            BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
-            {
-                proxy = new wkeProxy
-                {
-                    hostname = "",
-                    port = 8888,
-                    type = wkeProxyType.WKE_PROXY_HTTP,
-                    password = "",
-                    username = ""
-                },
-                mask = wkeSettingMask.WKE_SETTING_PROXY
-            });
+            //BlinkBrowserPInvoke.wkeInitializeExWrap(new wkeSettings()
+            //{
+            //    proxy = new wkeProxy
+            //    {
+            //        hostname = "",
+            //        port = 8888,
+            //        type = wkeProxyType.WKE_PROXY_HTTP,
+            //        password = "",
+            //        username = ""
+            //    },
+            //    mask = wkeSettingMask.WKE_SETTING_PROXY
+            //});
+
+            Console.WriteLine(blinkBrowser1.HTML);
+            //blinkBrowser1.HTML = "<h1>aha中文</h1>";
         }
 
         private void Form1_Load(object sender, EventArgs e)

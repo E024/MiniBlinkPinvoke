@@ -18,101 +18,22 @@ namespace MiniBlinkPinvoke
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
 
-      
-        private static OnDidDownloadCallback didDownloadCallback_2;
-        private static OnDidDownloadCallback didDownloadCallback_1;
-        private static OnDidDownloadCallback didDownloadCallback_0;
         public static IntPtr browser2 = IntPtr.Zero;
-
 
         static BlinkBrowserPInvoke()
         {
-
-            //if (System.IO.File.Exists(BlinkBrowserdll))
-            //{
-            //if (Environment.OSVersion.Version.Major >= 6)
-            //{
-            //wkeDisableWOFF(false);
-            //}
-       
-            //if (didDownloadCallback_2 == null)
-            //{
-            //    didDownloadCallback_2 = new OnDidDownloadCallback(DownloadCallback);
-            //}
-            //didDownloadCallback_0 = didDownloadCallback_2;
-            //wkeOnDidDownloadCallback(didDownloadCallback_0);
-            //}
         }
 
-        private static void DownloadCallback(string url, IntPtr data, uint size)
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        public static void ClearMemory()
         {
-            if (didDownloadCallback_1 != null)
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                didDownloadCallback_1(url, data, size);
-            }
-        }
-
-        public static Dictionary<string, Assembly> ResourceAssemblys
-        {
-            get
-            {
-                return dicResourcesAssembly;
-            }
-        }
-
-
-
-        public static string PageNameSpace { get; set; }
-        private static Func<string, byte[]> func;
-        private static Dictionary<string, Assembly> dicResourcesAssembly = new Dictionary<string, Assembly>();
-        public static void LoadMemoryData(IntPtr intptr, string url, SetDataCallback setDataCallback)
-        {
-            byte[] buffer;
-            IntPtr ptr;
-            string str = url;
-            if (func != null)
-            {
-                buffer = func(url);
-                if ((buffer != null) && (buffer.Length > 0))
-                {
-                    ptr = Marshal.AllocHGlobal(buffer.Length);
-                    Marshal.Copy(buffer, 0, ptr, buffer.Length);
-                    setDataCallback(intptr, ptr, (uint)buffer.Length);
-                    return;
-                }
-            }
-            if ((dicResourcesAssembly.Count != 0) && (url.IndexOf(':') < 0))
-            {
-                try
-                {
-                    Assembly assembly;
-                    url = url.TrimStart(new char[] { '\\', '/' });
-                    url = url.Replace('/', '.');
-                    url = url.Replace('\\', '.');
-                    string key = url.Substring(0, url.IndexOf('.'));
-                    if (dicResourcesAssembly.TryGetValue(key, out assembly))
-                    {
-                        Stream manifestResourceStream = assembly.GetManifestResourceStream(url);
-                        if (manifestResourceStream != null)
-                        {
-                            using (manifestResourceStream)
-                            {
-                                if (manifestResourceStream.Length > 0L)
-                                {
-                                    buffer = new byte[manifestResourceStream.Length];
-                                    manifestResourceStream.Read(buffer, 0, (int)manifestResourceStream.Length);
-                                    ptr = Marshal.AllocHGlobal(buffer.Length);
-                                    Marshal.Copy(buffer, 0, ptr, buffer.Length);
-                                    setDataCallback(intptr, ptr, (uint)buffer.Length);
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception.Message + " ：" + str + "路径有错，无法读取文件数据");
-                }
+                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
             }
         }
 
@@ -131,8 +52,6 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetString(IntPtr @string);
-
-
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSelectAll(IntPtr webView);
@@ -156,11 +75,6 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Single wkeGetMediaVolume(IntPtr webView);
 
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern IntPtr wkeCreateStringW([In] [MarshalAs(UnmanagedType.LPWStr)] string @string,long len);
-
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void wkeDisableWOFF([MarshalAs(UnmanagedType.I1)] bool isDisable);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnReadFile(ReadFileCallback _callback);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -185,9 +99,6 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetUserAgentW(IntPtr handle, [In] [MarshalAs(UnmanagedType.LPWStr)] string str);
 
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void wkeOnJsCall(IntPtr handle, JsCallCallback js);
-
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeJsBindFunction([MarshalAs(UnmanagedType.LPStr)] [In] string name, wkeJsNativeFunction fn, IntPtr param, uint argCount);
 
@@ -201,8 +112,6 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 jsString(IntPtr es, IntPtr str);
 
-        //[DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern Int64 wkeJSCallGlobal(IntPtr es, [MarshalAs(UnmanagedType.LPWStr)] [In] string str);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr jsToString(IntPtr es, Int64 v);
@@ -505,7 +414,9 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeLoadFile(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string filename);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeLoadHTML(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string html);
+        public static extern void wkeLoadHTML(IntPtr webView, IntPtr html);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeLoadHTMLW(IntPtr webView, [In, MarshalAs(UnmanagedType.LPWStr)] string html);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeLoadURL(IntPtr webView, IntPtr url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]

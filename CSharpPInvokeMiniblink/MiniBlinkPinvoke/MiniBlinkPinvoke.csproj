@@ -53,6 +53,7 @@
     <Compile Include="Core\BlinkENUM.cs" />
     <Compile Include="Core\BlinkStruct.cs" />
     <Compile Include="Core\GraphicsWrapper.cs" />
+    <Compile Include="Core\JSFunctin.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -260,11 +260,11 @@ namespace MiniBlinkPinvoke
             //{
             Invalidate(new Rectangle(x, y, cx, cy), false);
             #region 从 hdc 中取图像 开启这个可以取消 OnPaint 重写，但感觉页面有卡顿
-            ////lock (LockObj)
-            ////{
-            ////    GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
-            ////    ClearMemory();
-            ////}
+            //lock (LockObj)
+            //{
+            //    Core.GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
+            //    ClearMemory();
+            //}
             #endregion
             //Invalidate();
             //Graphics dc = Graphics.FromHdc(hdc);
@@ -407,7 +407,6 @@ namespace MiniBlinkPinvoke
                 {
                     Console.WriteLine("call jsBindGetter");
                     return jsStringW(es, Marshal.StringToCoTaskMemUni("{ \"name\": \"he\" }"));
-                    //return jsStringW(es, "这是C#返回值:" + jsToString(es, jsArg(es, 0)).Utf8IntptrToString());
                 });
                 BlinkBrowserPInvoke.wkeJsBindGetter("testJson", jsnavGet, IntPtr.Zero);
                 listObj.Add(jsnavGet);
@@ -431,21 +430,14 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
                 listObj.Add(_wkeLoadUrlEndCallback);
 
-                readFileCallback = new ReadFileCallback(LoadMemoryData);
-                wkeOnReadFile(readFileCallback);
-                listObj.Add(readFileCallback);
+                //readFileCallback = new ReadFileCallback(LoadMemoryData);
+                //wkeOnReadFile(readFileCallback);
+                //listObj.Add(readFileCallback);
             }
 
 
 
         }
-        //private void Timer_Tick(object sender, EventArgs e)
-        //{
-        //    if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
-        //    {
-        //        Invalidate();
-        //    }
-        //}
         protected override void OnPaint(PaintEventArgs e)
         {
 
@@ -466,8 +458,6 @@ namespace MiniBlinkPinvoke
                 using (Bitmap bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppPArgb, bits))
                 {
                     e.Graphics.DrawImage(bmp, 0, 0);
-                    //e.Graphics.DrawImage()
-
                 }
                 SetCursors();
             }
@@ -475,14 +465,11 @@ namespace MiniBlinkPinvoke
             {
                 base.OnPaint(e);
             }
-            //base.OnPaint(e);
             if (DesignMode)
             {
                 e.Graphics.DrawString("MiniBlinkBrowser", this.Font, Brushes.Red, new Point());
                 e.Graphics.DrawRectangle(Pens.Black, new Rectangle(0, 0, Width - 1, Height - 1));
             }
-            //Application.DoEvents();
-            //GC.Collect();
         }
 
         void SetCursors()
@@ -850,18 +837,7 @@ namespace MiniBlinkPinvoke
         {
             MessageBox.Show("Console_WriteLine w 方法被调用了：" + msg2 + " " + msg);
         }
-        /// <summary>
-        /// 释放内存
-        /// </summary>
-        public static void ClearMemory()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
-            }
-        }
+
 
         private void InitializeComponent()
         {
@@ -925,6 +901,30 @@ namespace MiniBlinkPinvoke
             }
         }
 
+        /// <summary>
+        /// 获取或设置网页源码
+        /// </summary>
+        public string HTML
+        {
+            get
+            {
+                if (handle != IntPtr.Zero)
+                {
+                    return InvokeJSW("return document.documentElement.outerHTML").ToString();
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (handle != IntPtr.Zero)
+                {
+                    BlinkBrowserPInvoke.wkeLoadHTMLW(this.handle, value);
+                }
+            }
+        }
         public string Url
         {
             get => url;
@@ -938,10 +938,7 @@ namespace MiniBlinkPinvoke
             }
         }
     }
-    public class JSFunctin : Attribute
-    {
-        public JSFunctin() { }
-    }
+
 
 
 }
