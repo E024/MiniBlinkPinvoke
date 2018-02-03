@@ -215,6 +215,7 @@ namespace MiniBlinkPinvoke
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 BlinkBrowserPInvoke.wkeSetUserAgentW(this.handle, "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36");
 
+
                 AlertBoxCallback = new AlertBoxCallback((a, b, c) =>
                 {
                     MessageBox.Show(Marshal.PtrToStringUni(wkeToStringW(c)), Url + "提示");
@@ -561,7 +562,11 @@ namespace MiniBlinkPinvoke
             return flags;
         }
 
-    
+        protected override void OnClick(EventArgs e)
+        {
+            this.Focus();
+            base.OnClick(e);
+        }
 
         public float _ZoomFactor { get; set; }
         [Browsable(false), DefaultValue(1)]
