@@ -562,6 +562,10 @@ namespace MiniBlinkPinvoke
             return flags;
         }
 
+        /// <summary>
+        /// 修复加载后点击没焦点导致操作无反映问题
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClick(EventArgs e)
         {
             this.Focus();
