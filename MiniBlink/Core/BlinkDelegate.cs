@@ -24,6 +24,11 @@ namespace MiniBlinkPinvoke
     public delegate bool PromptBoxCallback(IntPtr webView, IntPtr msg, IntPtr defaultResult, IntPtr result);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void wkeDocumentReadyCallback(IntPtr webView, IntPtr param);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void wkeDocumentReady2Callback(IntPtr webView, IntPtr param, IntPtr frameId);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void wkeNetResponseCallback(IntPtr webView, IntPtr param, IntPtr url,IntPtr job);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ReadFileCallback(IntPtr _caller, [MarshalAs(UnmanagedType.LPStr)]string szFile, SetDataCallback setData);
@@ -50,6 +55,10 @@ namespace MiniBlinkPinvoke
     public delegate bool wkeDownloadFileCallback(IntPtr webView, IntPtr param, string url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void DidDownloadCallback([In, MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr data, uint size);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void ContextCreateCallback(IntPtr es);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void TitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IntPtr wkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);
@@ -60,6 +69,8 @@ namespace MiniBlinkPinvoke
     public delegate Int64 JsCallCallback(IntPtr es);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void UrlChangedCallback2(IntPtr webView, IntPtr param, IntPtr frameId, IntPtr url);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool wkeNavigationCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url);

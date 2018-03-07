@@ -49,12 +49,18 @@
     <Compile Include="Core\BlinkDelegate.cs" />
     <Compile Include="Core\BlinkENUM.cs" />
     <Compile Include="Core\BlinkStruct.cs" />
+    <Compile Include="Core\GraphicsWrapper.cs" />
+    <Compile Include="Core\JSFunctin.cs" />
+    <Compile Include="Core\JsValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BlinkBrowser.resx">
       <DependentUpon>BlinkBrowser.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="wkedefine.h" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

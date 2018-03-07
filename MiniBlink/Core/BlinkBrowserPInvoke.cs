@@ -15,14 +15,93 @@ namespace MiniBlinkPinvoke
     public static class BlinkBrowserPInvoke
     {
         const string BlinkBrowserdll = "node.dll";//"node.dll";miniblink
+        [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
+        public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
 
         public static IntPtr browser2 = IntPtr.Zero;
 
+        private static Dictionary<string, Assembly> _ResourceAssemblys = new Dictionary<string, Assembly>();
+        public static Dictionary<string, Assembly> ResourceAssemblys
+        {
+            get
+            {
+                return _ResourceAssemblys;
+            }
+        }
         static BlinkBrowserPInvoke()
         {
         }
+
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        public static void ClearMemory()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+            }
+        }
+        /// <summary>
+        /// 设置页面控件的偏移量，一般用作控件时，需要制定位置，否则会出现事件响应位置有问题。
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetHandleOffset(IntPtr webView, int x, int y);
+        /// <summary>
+        /// 是否启用插件
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetNpapiPluginsEnabled(IntPtr webView, bool Enable);
+        /// <summary>
+        /// 是否渲染,True 禁止渲染，false 启用渲染
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetHeadlessEnabled(IntPtr webView, bool Enable);
+        /// <summary>
+        /// 绑定View请求时，所用IP，比如一台电脑两个IP的情况下，可以指定某个IP访问
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="netInterface"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetViewNetInterface(IntPtr webView, IntPtr netInterface);
+        /// <summary>
+        /// 是否检查CSP，也就是跨域安全检查
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetCspCheckEnable(IntPtr webView, bool Enable);
+        /// <summary>
+        /// 是否新开窗口
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetNavigationToNewWindowEnable(IntPtr webView, bool Enable);
+
+        /// <summary>
+        /// 是否启用 Touch 触摸事件
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetTouchEnabled(IntPtr webView, bool Enable);
+        /// <summary>
+        /// 是否启用内存缓存
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="Enable"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetMemoryCacheEnable(IntPtr webView, bool Enable);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnLoadUrlBegin(IntPtr webView, wkeLoadUrlBeginCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -72,6 +151,13 @@ namespace MiniBlinkPinvoke
         public static extern void wkeNetSetURL(IntPtr job, [MarshalAs(UnmanagedType.LPStr)]string url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeNetSetData(IntPtr job, IntPtr buf, int len);
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeNetOnResponse(IntPtr webView, wkeNetResponseCallback callback, IntPtr param);
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeNetGetMIMEType(IntPtr job, IntPtr mime);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeNetHookRequest(IntPtr job);
 
@@ -237,6 +323,18 @@ namespace MiniBlinkPinvoke
         public static extern Int64 wkeRunJS(IntPtr webView, IntPtr script);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 wkeRunJSW(IntPtr webView, [In] [MarshalAs(UnmanagedType.LPWStr)] string script);
+        /// <summary>
+        /// 可以在wkeOnDocumentReady2回调里注入JS执行 
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="frameId"></param>
+        /// <param name="script"></param>
+        /// <param name="isInClosure"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeRunJsByFrame(IntPtr webView, IntPtr frameId, IntPtr script, [MarshalAs(UnmanagedType.I1)] bool isInClosure);
+
+
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnAlertBox(IntPtr webView, AlertBoxCallback callback, IntPtr callbackParam);
         /// <summary>
@@ -399,8 +497,6 @@ namespace MiniBlinkPinvoke
         public static extern bool wkeIsTransparent(IntPtr webView);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeJSCollectGarbge();
-
-        public delegate void ContextCreateCallback(IntPtr es);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeJSContextCreateCallback(ContextCreateCallback cb);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -427,16 +523,24 @@ namespace MiniBlinkPinvoke
         public static extern void wkeOnConsole(IntPtr webView, wkeConsoleMessageCallback callback, IntPtr param);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnCreateView(IntPtr webView, wkeCreateViewCallback callback, IntPtr param);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void DidDownloadCallback([In, MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr data, uint size);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnDidDownloadCallback(DidDownloadCallback callback_);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnDocumentReady(IntPtr webView, wkeDocumentReadyCallback callback, IntPtr param);
+        /// <summary>
+        /// 可判断是不是主 frame 加载完成
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="callback"></param>
+        /// <param name="param"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeOnDocumentReady2(IntPtr webView, wkeDocumentReadyCallback callback, IntPtr param);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnLoadingFinish(IntPtr webView, wkeLoadingFinishCallback callback, IntPtr param);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnNavigation(IntPtr webView, wkeNavigationCallback callback, IntPtr param);
+
+
 
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -445,6 +549,22 @@ namespace MiniBlinkPinvoke
         public static extern void wkeOnTitleChanged(IntPtr webView, TitleChangedCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnURLChanged(IntPtr webView, UrlChangedCallback callback, IntPtr callbackParam);
+        /// <summary>
+        /// 可以实现类似谷歌浏览器鼠标移动到带有超链接的地方，给出链接地址。
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="callback"></param>
+        /// <param name="callbackParam"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeOnMouseOverUrlChanged(IntPtr webView, TitleChangedCallback callback, IntPtr callbackParam);
+        /// <summary>
+        /// URL 改变，可判断是否是主 frame 的url 改变
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="callback"></param>
+        /// <param name="callbackParam"></param>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeOnURLChanged2(IntPtr webView, UrlChangedCallback2 callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkePostURL(IntPtr webView, [In, MarshalAs(UnmanagedType.LPStr)] string url, IntPtr data, int dataBytes);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
@@ -474,5 +594,23 @@ namespace MiniBlinkPinvoke
         public static extern void wkeSetStoragePath([MarshalAs(UnmanagedType.LPWStr)] [In] string directory);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetVersionString();
+
+
+        public static string Utf8IntptrToString(this IntPtr ptr)
+        {
+            var data = new List<byte>();
+            var off = 0;
+            while (true)
+            {
+                var ch = Marshal.ReadByte(ptr, off++);
+                if (ch == 0)
+                {
+                    break;
+                }
+                data.Add(ch);
+            }
+            return Encoding.UTF8.GetString(data.ToArray());
+        }
+
     }
 }
