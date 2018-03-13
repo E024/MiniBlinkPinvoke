@@ -441,6 +441,11 @@ namespace MiniBlinkPinvoke
             //});
 
             handle = BlinkBrowserPInvoke.wkeCreateWebView();
+
+            //只有开启才会触发 wkeOnCreateView
+            //wkeSetNavigationToNewWindowEnable(handle, true);
+
+            BlinkBrowserPInvoke.wkeSetHandleOffset(handle, Location.X, Location.Y);
             //BlinkBrowserPInvoke.wkeSetTransparent(handle, true);
             BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
             CookiePath = Application.StartupPath + "\\cookie\\";
@@ -514,9 +519,9 @@ namespace MiniBlinkPinvoke
             BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
             listObj.Add(_wkeDownloadFileCallback);
 
-            _wkeCreateViewCallback = OnwkeCreateViewCallback;
-            BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
-            listObj.Add(_wkeCreateViewCallback);
+            //_wkeCreateViewCallback = OnwkeCreateViewCallback;
+            //BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
+            //listObj.Add(_wkeCreateViewCallback);
 
             _wkeLoadUrlBeginCallback = OnwkeLoadUrlBeginCallback;
             BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
@@ -917,7 +922,7 @@ namespace MiniBlinkPinvoke
         //private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
         public void BindJsFunc()
         {
-            if (GlobalObjectJs==null)
+            if (GlobalObjectJs == null)
             {
                 GlobalObjectJs = this;
             }
