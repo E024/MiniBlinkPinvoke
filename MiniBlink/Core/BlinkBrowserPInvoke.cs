@@ -52,6 +52,8 @@ namespace MiniBlinkPinvoke
         /// <param name="y"></param>
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetHandleOffset(IntPtr webView, int x, int y);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetHandle(IntPtr webView, IntPtr wnd);
         /// <summary>
         /// 是否启用插件
         /// </summary>

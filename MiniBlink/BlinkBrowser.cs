@@ -445,7 +445,11 @@ namespace MiniBlinkPinvoke
             //只有开启才会触发 wkeOnCreateView
             //wkeSetNavigationToNewWindowEnable(handle, true);
 
-            BlinkBrowserPInvoke.wkeSetHandleOffset(handle, Location.X, Location.Y);
+            BlinkBrowserPInvoke.wkeSetHandle(this.handle, this.Handle);
+            BlinkBrowserPInvoke.wkeSetHandleOffset(handle, Location.X - 2, 0);
+
+
+
             //BlinkBrowserPInvoke.wkeSetTransparent(handle, true);
             BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
             CookiePath = Application.StartupPath + "\\cookie\\";
