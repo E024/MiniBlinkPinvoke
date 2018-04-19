@@ -31,11 +31,11 @@ namespace MiniBlinkPinvoke
 
         public event TitleChangedCallback OnTitleChangeCall;
 
-        static UrlChangedCallback urlChangedCallback;
+        UrlChangedCallback urlChangedCallback;
         public delegate void URLChange(string url);
         public event URLChange OnUrlChangeCall;
 
-        static UrlChangedCallback2 urlChangedCallback2;
+        UrlChangedCallback2 urlChangedCallback2;
         public delegate void URLChange2(string url);
         public event URLChange2 OnUrlChange2Call;
 
@@ -75,18 +75,18 @@ namespace MiniBlinkPinvoke
 
         List<object> listObj = new List<object>();
 
-        static AlertBoxCallback AlertBoxCallback;
-        static TitleChangedCallback titleChangeCallback;
-        static TitleChangedCallback titleChangeCallback2;
-        static wkeNavigationCallback _wkeNavigationCallback;
-        static wkeConsoleMessageCallback _wkeConsoleMessageCallback;
-        static wkePaintUpdatedCallback _wkePaintUpdatedCallback;
-        static wkeDocumentReadyCallback _wkeDocumentReadyCallback;
-        static wkeLoadingFinishCallback _wkeLoadingFinishCallback;
-        static wkeDownloadFileCallback _wkeDownloadFileCallback;
-        static wkeCreateViewCallback _wkeCreateViewCallback;
-        static wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
-        static wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
+        AlertBoxCallback AlertBoxCallback;
+        TitleChangedCallback titleChangeCallback;
+        TitleChangedCallback titleChangeCallback2;
+        wkeNavigationCallback _wkeNavigationCallback;
+        wkeConsoleMessageCallback _wkeConsoleMessageCallback;
+        wkePaintUpdatedCallback _wkePaintUpdatedCallback;
+        wkeDocumentReadyCallback _wkeDocumentReadyCallback;
+        wkeLoadingFinishCallback _wkeLoadingFinishCallback;
+        wkeDownloadFileCallback _wkeDownloadFileCallback;
+        wkeCreateViewCallback _wkeCreateViewCallback;
+        wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
+        wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
@@ -225,17 +225,6 @@ namespace MiniBlinkPinvoke
                 ControlStyles.UserPaint, true);
             UpdateStyles();
 
-            //MouseEnter += ((s, ea) =>
-            //{
-            //    lock (LockObj)
-            //    {
-            //        if (!this.Focused)
-            //        {
-            //            this.Focus();
-            //        }
-            //    }
-            //});
-
 
             contextMenuStrip.Opening += ContextMenuStrip1_Opening;
 
@@ -289,24 +278,20 @@ namespace MiniBlinkPinvoke
         {
             if (this.handle != IntPtr.Zero)
             {
-                lock (LockObj)
+                foreach (ToolStripMenuItem item in contextMenuStrip.Items)
                 {
-                    foreach (ToolStripMenuItem item in contextMenuStrip.Items)
+                    if (item.Text == "返回")
                     {
-                        if (item.Text == "返回")
-                        {
-                            item.Enabled = wkeCanGoBack(this.handle);
-                        }
-                        if (item.Text == "前进")
-                        {
-                            item.Enabled = wkeCanGoForward(this.handle);
-                        }
-                        //if (item.Text == "全选")
-                        //{
-                        //    item.Enabled = wkeCanGoForward(this.handle);
-                        //}
+                        item.Enabled = wkeCanGoBack(this.handle);
                     }
-
+                    if (item.Text == "前进")
+                    {
+                        item.Enabled = wkeCanGoForward(this.handle);
+                    }
+                    //if (item.Text == "全选")
+                    //{
+                    //    item.Enabled = wkeCanGoForward(this.handle);
+                    //}
                 }
             }
         }
@@ -368,11 +353,9 @@ namespace MiniBlinkPinvoke
             //{
             Invalidate(new Rectangle(x, y, cx, cy), false);
             #region 从 hdc 中取图像 开启这个可以取消 OnPaint 重写，但感觉页面有卡顿
-            //lock (LockObj)
-            //{
+
             //    Core.GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
             //    ClearMemory();
-            //}
             #endregion
             //Invalidate();
             //Graphics dc = Graphics.FromHdc(hdc);
@@ -713,155 +696,129 @@ namespace MiniBlinkPinvoke
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
-            if (handle != IntPtr.Zero)
+            if (handle != IntPtr.Zero && Width > 0 && Height > 0)
             {
                 BlinkBrowserPInvoke.wkeResize(handle, Width, Height);
                 Invalidate();
             }
         }
-        static object LockObj = new object();
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            lock (LockObj)
+
+            base.OnMouseWheel(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnMouseWheel(e);
-                if (handle != IntPtr.Zero)
-                {
-                    uint flags = GetMouseFlags(e);
-                    BlinkBrowserPInvoke.wkeFireMouseWheelEvent(handle, e.X, e.Y, e.Delta, flags);
-                }
+                uint flags = GetMouseFlags(e);
+                BlinkBrowserPInvoke.wkeFireMouseWheelEvent(handle, e.X, e.Y, e.Delta, flags);
             }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            lock (LockObj)
+
+            base.OnMouseDown(e);
+            uint msg = 0;
+            if (e.Button == MouseButtons.Left)
             {
-                base.OnMouseDown(e);
-                uint msg = 0;
-                if (e.Button == MouseButtons.Left)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_LBUTTONDOWN;
-                }
-                else if (e.Button == MouseButtons.Middle)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_MBUTTONDOWN;
-                }
-                else if (e.Button == MouseButtons.Right)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_RBUTTONDOWN;
-                }
-                uint flags = GetMouseFlags(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
-                }
+                msg = (uint)wkeMouseMessage.WKE_MSG_LBUTTONDOWN;
+            }
+            else if (e.Button == MouseButtons.Middle)
+            {
+                msg = (uint)wkeMouseMessage.WKE_MSG_MBUTTONDOWN;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                msg = (uint)wkeMouseMessage.WKE_MSG_RBUTTONDOWN;
+            }
+            uint flags = GetMouseFlags(e);
+            if (handle != IntPtr.Zero)
+            {
+                BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
             }
         }
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            lock (LockObj)
+            base.OnMouseUp(e);
+            uint msg = 0;
+            if (e.Button == MouseButtons.Left)
             {
-                base.OnMouseUp(e);
-                uint msg = 0;
-                if (e.Button == MouseButtons.Left)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_LBUTTONUP;
-                }
-                else if (e.Button == MouseButtons.Middle)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_MBUTTONUP;
-                }
-                else if (e.Button == MouseButtons.Right)
-                {
-                    msg = (uint)wkeMouseMessage.WKE_MSG_RBUTTONUP;
-                }
-                uint flags = GetMouseFlags(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
-                    //if (e.Button == MouseButtons.Right)
-                    //{
-                    //    EwePInvoke.wkeFireContextMenuEvent(handle, e.X, e.Y, flags);
-                    //}
-                }
+                msg = (uint)wkeMouseMessage.WKE_MSG_LBUTTONUP;
+            }
+            else if (e.Button == MouseButtons.Middle)
+            {
+                msg = (uint)wkeMouseMessage.WKE_MSG_MBUTTONUP;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                msg = (uint)wkeMouseMessage.WKE_MSG_RBUTTONUP;
+            }
+            uint flags = GetMouseFlags(e);
+            if (handle != IntPtr.Zero)
+            {
+                BlinkBrowserPInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
+                //if (e.Button == MouseButtons.Right)
+                //{
+                //    EwePInvoke.wkeFireContextMenuEvent(handle, e.X, e.Y, flags);
+                //}
             }
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            lock (LockObj)
+            //base.OnMouseMove(e);
+            //if (handle != IntPtr.Zero)
+            //{
+            //    //uint msg = (uint)wkeMouseMessage.WKE_MSG_MOUSEMOVE;
+            //    uint flags = GetMouseFlags(e);
+            //    //EwePInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
+            //    EwePInvoke.wkeFireMouseEvent(handle, 0x200, e.X, e.Y, flags);
+            //}
+            base.OnMouseMove(e);
+            if (this.handle != IntPtr.Zero)
             {
-                //base.OnMouseMove(e);
-                //if (handle != IntPtr.Zero)
-                //{
-                //    //uint msg = (uint)wkeMouseMessage.WKE_MSG_MOUSEMOVE;
-                //    uint flags = GetMouseFlags(e);
-                //    //EwePInvoke.wkeFireMouseEvent(handle, msg, e.X, e.Y, flags);
-                //    EwePInvoke.wkeFireMouseEvent(handle, 0x200, e.X, e.Y, flags);
-                //}
-                base.OnMouseMove(e);
-                if (this.handle != IntPtr.Zero)
-                {
-                    uint flags = GetMouseFlags(e);
-                    BlinkBrowserPInvoke.wkeFireMouseEvent(this.handle, 0x200, e.X, e.Y, flags);
-                }
+                uint flags = GetMouseFlags(e);
+                BlinkBrowserPInvoke.wkeFireMouseEvent(this.handle, 0x200, e.X, e.Y, flags);
             }
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            lock (LockObj)
+            base.OnKeyDown(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnKeyDown(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeFireKeyDownEvent(handle, (uint)e.KeyValue, 0, false);
-                }
+                BlinkBrowserPInvoke.wkeFireKeyDownEvent(handle, (uint)e.KeyValue, 0, false);
             }
         }
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
-            lock (LockObj)
+            base.OnKeyPress(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnKeyPress(e);
-                if (handle != IntPtr.Zero)
-                {
-                    e.Handled = true;
-                    BlinkBrowserPInvoke.wkeFireKeyPressEvent(handle, (uint)e.KeyChar, 0, false);
-                }
+                e.Handled = true;
+                BlinkBrowserPInvoke.wkeFireKeyPressEvent(handle, (uint)e.KeyChar, 0, false);
             }
         }
         protected override void OnKeyUp(KeyEventArgs e)
         {
-            lock (LockObj)
+            base.OnKeyUp(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnKeyUp(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeFireKeyUpEvent(handle, (uint)e.KeyValue, 0, false);
-                }
+                BlinkBrowserPInvoke.wkeFireKeyUpEvent(handle, (uint)e.KeyValue, 0, false);
             }
         }
 
         protected override void OnGotFocus(EventArgs e)
         {
-            lock (LockObj)
+            base.OnGotFocus(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnGotFocus(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeSetFocus(handle);
-                }
+                BlinkBrowserPInvoke.wkeSetFocus(handle);
             }
         }
 
         protected override void OnLostFocus(EventArgs e)
         {
-            lock (LockObj)
+            base.OnLostFocus(e);
+            if (handle != IntPtr.Zero)
             {
-                base.OnLostFocus(e);
-                if (handle != IntPtr.Zero)
-                {
-                    BlinkBrowserPInvoke.wkeKillFocus(handle);
-                }
+                BlinkBrowserPInvoke.wkeKillFocus(handle);
             }
         }
 
