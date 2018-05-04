@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniBlink", "MiniBlink\MiniBlink.csproj", "{FF9F4C6E-B7BA-498A-9F3F-49F27CE9AF1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniBlinkPinvokeDemo", "MiniBlinkPinvokeDemo\MiniBlinkPinvokeDemo.csproj", "{0EAAE309-A967-4C07-AB24-F276E9EF56EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniBlinkPinvokeDemo", "..\MiniBlinkPinvokeDemo\MiniBlinkPinvokeDemo.csproj", "{0EAAE309-A967-4C07-AB24-F276E9EF56EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

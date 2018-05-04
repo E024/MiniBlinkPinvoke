@@ -274,6 +274,13 @@ namespace MiniBlinkPinvoke
             //GlobalObjectJs = this;
         }
 
+        ~BlinkBrowser()
+        {
+            if (handle != IntPtr.Zero)
+            {
+                BlinkBrowserPInvoke.wkeFinalize();
+            }
+        }
         private void ContextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (this.handle != IntPtr.Zero)
@@ -518,7 +525,7 @@ namespace MiniBlinkPinvoke
             wkeJsNativeFunction jsnav = new wkeJsNativeFunction((es, param) =>
             {
                 string s = jsToString(es, jsArg(es, 0)).Utf8IntptrToString();
-                IntPtr strPtr = Marshal.StringToCoTaskMemUni("这是C#返回值:" + s);
+                IntPtr strPtr = Marshal.StringToCoTaskMemUni("这是C#后台返回值:" + s);
                 Int64 result = jsStringW(es, strPtr);
                 Marshal.FreeCoTaskMem(strPtr);
                 return result;
@@ -936,15 +943,26 @@ namespace MiniBlinkPinvoke
                             }
                             try
                             {
-                                item.Invoke(GlobalObjectJs, listParam);
+                                var res = item.Invoke(GlobalObjectJs, listParam);
+                                if (res != null)
+                                {
+                                    var mStr = Marshal.StringToHGlobalUni(res.ToString());
+                                    return BlinkBrowserPInvoke.jsStringW(es, mStr);//返回JS字符串
+                                }
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
+                                Console.WriteLine(ex.ToString());
                             }
                         }
                         else
                         {
-                            item.Invoke(GlobalObjectJs, null);
+                            var res = item.Invoke(GlobalObjectJs, null);
+                            if (res != null)
+                            {
+                                var mStr = Marshal.StringToHGlobalUni(res.ToString());
+                                return BlinkBrowserPInvoke.jsStringW(es, mStr);//返回JS字符串
+                            }
                         }
                         return param;
                     });
