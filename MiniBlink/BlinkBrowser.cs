@@ -19,6 +19,8 @@ namespace MiniBlinkPinvoke
     public class BlinkBrowser : Control
     {
 
+        //Timer timer = new Timer();
+
         string CookiePath { get; set; }
         public IntPtr handle = IntPtr.Zero;
         string url = string.Empty;
@@ -28,8 +30,8 @@ namespace MiniBlinkPinvoke
         Size oldSize;
         public object GlobalObjectJs = null;
 
-
-        public event TitleChangedCallback OnTitleChangeCall;
+        public delegate void TitleChange(string title);
+        public event TitleChange OnTitleChangeCall;
 
         UrlChangedCallback urlChangedCallback;
         public delegate void URLChange(string url);
@@ -44,6 +46,9 @@ namespace MiniBlinkPinvoke
 
         public delegate void DocumentReady();
         public event DocumentReady DocumentReadyCallback;
+
+        public delegate IntPtr OnCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, string url);
+        public event OnCreateViewCallback OnCreateViewEvent;
 
         /// <summary>
         /// 页面是否加载失败
@@ -174,9 +179,16 @@ namespace MiniBlinkPinvoke
         }
         IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
-            Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).Utf8IntptrToString());
-            Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
-            return webView;
+            if (OnCreateViewEvent != null)
+            {
+                return OnCreateViewEvent(webView, param, navigationType, wkeGetString(url).Utf8IntptrToString());
+            }
+            else
+            {
+                Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).Utf8IntptrToString());
+                Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
+                return webView;
+            }
         }
         bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
         {
@@ -305,7 +317,10 @@ namespace MiniBlinkPinvoke
 
         void OnTitleChangedCallback(IntPtr webView, IntPtr param, IntPtr title)
         {
-            OnTitleChangeCall?.Invoke(webView, param, title);
+            if (OnTitleChangeCall != null)
+            {
+                OnTitleChangeCall(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetString(title).Utf8IntptrToString());
+            }
         }
 
         void OnTitleChangedCallback2(IntPtr webView, IntPtr param, IntPtr title)
@@ -358,11 +373,13 @@ namespace MiniBlinkPinvoke
             ////Console.WriteLine(string.Format("call OnWkePaintUpdatedCallback {0},{1},{2},{3},{4},{5}", param, hdc, x, y, cx, cy));
             //if (handle != IntPtr.Zero && BlinkBrowserPInvoke.wkeIsDirty(handle))
             //{
+            //Invalidate(new Rectangle(0,0,this.Width,this.Height));
+            // Console.WriteLine(DateTime.Now + " 调用重绘");
             Invalidate(new Rectangle(x, y, cx, cy), false);
             #region 从 hdc 中取图像 开启这个可以取消 OnPaint 重写，但感觉页面有卡顿
 
-            //    Core.GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
-            //    ClearMemory();
+            //Core.GraphicsWrapper.CopyTo(Graphics.FromHdcInternal(hdc), this.CreateGraphics(), new Rectangle(x, y, cx, cy));
+            // ClearMemory();
             #endregion
             //Invalidate();
             //Graphics dc = Graphics.FromHdc(hdc);
@@ -433,7 +450,7 @@ namespace MiniBlinkPinvoke
             handle = BlinkBrowserPInvoke.wkeCreateWebView();
 
             //只有开启才会触发 wkeOnCreateView
-            //wkeSetNavigationToNewWindowEnable(handle, true);
+            wkeSetNavigationToNewWindowEnable(handle, true);
 
             BlinkBrowserPInvoke.wkeSetHandle(this.handle, this.Handle);
             BlinkBrowserPInvoke.wkeSetHandleOffset(handle, Location.X - 2, 0);
@@ -513,9 +530,9 @@ namespace MiniBlinkPinvoke
             BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
             listObj.Add(_wkeDownloadFileCallback);
 
-            //_wkeCreateViewCallback = OnwkeCreateViewCallback;
-            //BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
-            //listObj.Add(_wkeCreateViewCallback);
+            _wkeCreateViewCallback = OnwkeCreateViewCallback;
+            BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
+            listObj.Add(_wkeCreateViewCallback);
 
             _wkeLoadUrlBeginCallback = OnwkeLoadUrlBeginCallback;
             BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
@@ -570,7 +587,19 @@ namespace MiniBlinkPinvoke
             //AllowDrop = true;
             //DragEnter += BlinkBrowser_DragEnter;
             //DragDrop += BlinkBrowser_DragDrop;
+
+
+
+            //timer.Interval = 25;
+            //timer.Tick += Timer_Tick;
+            //timer.Enabled = true;
         }
+
+        //private void Timer_Tick(object sender, EventArgs e)
+        //{
+        //    Console.WriteLine(DateTime.Now + " 调用重绘");
+        //    this.Invalidate();
+        //}
 
         private void BlinkBrowser_DragDrop(object sender, DragEventArgs e)
         {
