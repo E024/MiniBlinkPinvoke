@@ -148,7 +148,7 @@ namespace MiniBlinkPinvoke
                             {
                                 wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
                             }
-                            wkeNetSetURL(job, url);
+                            //wkeNetSetURL(job, url);
                             wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
                         }
                         else
@@ -1066,7 +1066,7 @@ namespace MiniBlinkPinvoke
                         {
                             var _cookie = listCookie[0];
 
-                            Lable:
+                        Lable:
                             if (_cookie == host)
                             {
                                 sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
@@ -1124,7 +1124,7 @@ namespace MiniBlinkPinvoke
         }
         public string Url
         {
-            get => url;
+            get { return url; }
             set
             {
                 url = value;
