@@ -16,7 +16,7 @@ using static MiniBlinkPinvoke.BlinkBrowserPInvoke;
 
 namespace MiniBlinkPinvoke
 {
-    public class BlinkBrowser : Control
+    public class BlinkBrowser : Control, IMessageFilter
     {
 
         //Timer timer = new Timer();
@@ -49,6 +49,14 @@ namespace MiniBlinkPinvoke
 
         public delegate IntPtr OnCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, string url);
         public event OnCreateViewCallback OnCreateViewEvent;
+
+
+        wkeOnShowDevtoolsCallback _wkeOnShowDevtoolsCallback;
+
+        public void ShowDevtools(string path)
+        {
+            BlinkBrowserPInvoke.wkeShowDevtools(this.handle, path, _wkeOnShowDevtoolsCallback, IntPtr.Zero);
+        }
 
         /// <summary>
         /// 页面是否加载失败
@@ -93,11 +101,14 @@ namespace MiniBlinkPinvoke
         wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
         wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
+        //void OnShowDevtoolsCallback(string path, IntPtr param)
+        //{
+        //    BlinkBrowserPInvoke.wkeShowDevtools(this.handle, path, _wkeOnShowDevtoolsCallback, IntPtr.Zero);
+        //}
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
             Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
             Console.WriteLine(buf.Utf8IntptrToString().Length);
-            //  Marshal.Release(buf);
         }
 
         bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
@@ -174,7 +185,7 @@ namespace MiniBlinkPinvoke
         {
             string data = "<html><head><title>404没有找到资源</title></head><body>404没有找到资源</body></html>";
             wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
-            wkeNetSetURL(job, url);
+            //wkeNetSetURL(job, url);
             wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
         }
         IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
@@ -284,6 +295,7 @@ namespace MiniBlinkPinvoke
             contextMenuStrip.Items.Add(tsmiDelete);
 
             //GlobalObjectJs = this;
+            Application.AddMessageFilter(this);
         }
 
         ~BlinkBrowser()
@@ -579,6 +591,7 @@ namespace MiniBlinkPinvoke
             BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
             listObj.Add(_wkeLoadUrlEndCallback);
 
+            //BlinkBrowserPInvoke.wkeShowDevtools()
             //readFileCallback = new ReadFileCallback(LoadMemoryData);
             //wkeOnReadFile(readFileCallback);
             //listObj.Add(readFileCallback);
@@ -1043,6 +1056,24 @@ namespace MiniBlinkPinvoke
 
         }
 
+        public bool PreFilterMessage(ref Message m)
+        {
+            //throw new NotImplementedException();
+            IntPtr myPtr = GetForegroundWindow();
+
+            int length = GetWindowTextLength(myPtr);
+            StringBuilder windowName = new StringBuilder(length + 1);
+            GetWindowText(myPtr, windowName, windowName.Capacity);
+            if (windowName.ToString() == "Miniblink Devtools")
+            {
+                if (m.Msg == 0x0102 || m.Msg == 0x0100)
+                {
+                    SendMessage(m.HWnd, m.Msg, m.WParam, m.LParam);
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// 解析 cookies.dat文件得到Cookie,没有判断 path，只有 域的判断
         /// </summary>
@@ -1066,7 +1097,7 @@ namespace MiniBlinkPinvoke
                         {
                             var _cookie = listCookie[0];
 
-                        Lable:
+                            Lable:
                             if (_cookie == host)
                             {
                                 sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);

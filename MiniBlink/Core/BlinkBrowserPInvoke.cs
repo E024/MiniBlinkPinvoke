@@ -17,8 +17,14 @@ namespace MiniBlinkPinvoke
         const string BlinkBrowserdll = "node.dll";//"node.dll";miniblink
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
-
-        public static IntPtr browser2 = IntPtr.Zero;
+        [DllImport("user32.dll", EntryPoint = "SendMessageA")]
+        public static extern int SendMessage(IntPtr hwnd, int wMsg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")]
+        public static extern int GetWindowTextLength(IntPtr hWnd);
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int nMaxCount);
 
         private static Dictionary<string, Assembly> _ResourceAssemblys = new Dictionary<string, Assembly>();
         public static Dictionary<string, Assembly> ResourceAssemblys
@@ -104,6 +110,10 @@ namespace MiniBlinkPinvoke
         /// <param name="Enable"></param>
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetMemoryCacheEnable(IntPtr webView, bool Enable);
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeShowDevtools(IntPtr webView, [In] [MarshalAs(UnmanagedType.LPWStr)] string path, wkeOnShowDevtoolsCallback callback, IntPtr param);
+
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeOnLoadUrlBegin(IntPtr webView, wkeLoadUrlBeginCallback callback, IntPtr callbackParam);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]

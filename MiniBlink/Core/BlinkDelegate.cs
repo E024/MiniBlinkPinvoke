@@ -84,4 +84,6 @@ namespace MiniBlinkPinvoke
     public delegate Int64 jsNativeFunction(IntPtr es);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Auto)]
     public delegate Int64 wkeJsNativeFunction(IntPtr es, IntPtr param);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Auto)]
+    public delegate void wkeOnShowDevtoolsCallback(IntPtr webView, IntPtr param);
 }
