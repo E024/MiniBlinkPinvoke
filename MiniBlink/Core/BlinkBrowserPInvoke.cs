@@ -17,7 +17,7 @@ namespace MiniBlinkPinvoke
         const string BlinkBrowserdll = "node.dll";//"node.dll";miniblink
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
-        [DllImport("user32.dll", EntryPoint = "SendMessageA")]
+        [DllImport("user32.dll", EntryPoint = "SendMessageW")]
         public static extern int SendMessage(IntPtr hwnd, int wMsg, IntPtr wParam, IntPtr lParam);
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern IntPtr GetForegroundWindow();
