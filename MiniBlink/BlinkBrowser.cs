@@ -50,6 +50,11 @@ namespace MiniBlinkPinvoke
         public delegate IntPtr OnCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, string url);
         public event OnCreateViewCallback OnCreateViewEvent;
 
+        //URL end 回调通知
+        public delegate void OnUrlEnd(byte[] bytes, string url, int len);
+        public event OnUrlEnd OnUrlEndEvent;
+
+
 
         wkeOnShowDevtoolsCallback _wkeOnShowDevtoolsCallback;
 
@@ -107,10 +112,15 @@ namespace MiniBlinkPinvoke
         //}
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
+            if (OnUrlEndEvent != null)
+            {
+                byte[] managedArray = new byte[len];
+                Marshal.Copy(buf, managedArray, 0, len);
+                OnUrlEndEvent(managedArray, url, len);
+            }
             Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
-            Console.WriteLine(buf.Utf8IntptrToString().Length);
+            //Console.WriteLine(buf.Utf8IntptrToString().Length);
         }
-
         bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
         {
             //mb://index.html/js/index.js
@@ -177,7 +187,7 @@ namespace MiniBlinkPinvoke
             else
             {
                 //如果需要 OnwkeLoadUrlEndCallback 回调，需要取消注释下面的 hook
-                //wkeNetHookRequest(job);
+                wkeNetHookRequest(job);
             }
             return false;
         }
@@ -248,7 +258,6 @@ namespace MiniBlinkPinvoke
                 ControlStyles.UserPaint, true);
             UpdateStyles();
 
-
             contextMenuStrip.Opening += ContextMenuStrip1_Opening;
 
             ContextMenuStrip = contextMenuStrip;
@@ -294,7 +303,6 @@ namespace MiniBlinkPinvoke
             contextMenuStrip.Items.Add(tsmiPaste);
             contextMenuStrip.Items.Add(tsmiDelete);
 
-            //GlobalObjectJs = this;
             Application.AddMessageFilter(this);
         }
 
@@ -1163,6 +1171,14 @@ namespace MiniBlinkPinvoke
                 {
                     BlinkBrowserPInvoke.wkeLoadURLW(handle, url);
                 }
+            }
+        }
+
+        public string Cookies
+        {
+            get
+            {
+                return BlinkBrowserPInvoke.wkeGetCookie(handle).Utf8IntptrToString();
             }
         }
     }
