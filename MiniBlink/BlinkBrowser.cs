@@ -54,6 +54,9 @@ namespace MiniBlinkPinvoke
         public delegate void OnUrlEnd(byte[] bytes, string url, int len);
         public event OnUrlEnd OnUrlEndEvent;
 
+        //下载事件回调通知
+        public delegate void OnDownload(string url);
+        public event OnDownload OnDownloadFile;
 
 
         wkeOnShowDevtoolsCallback _wkeOnShowDevtoolsCallback;
@@ -214,6 +217,10 @@ namespace MiniBlinkPinvoke
         bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
         {
             Console.WriteLine("call OnwkeDownloadFileCallback:" + (url));
+            if (OnDownloadFile!=null)
+            {
+                OnDownloadFile(url);
+            }
             return false;
         }
 
