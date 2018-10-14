@@ -6,13 +6,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static MiniBlinkPinvoke.BlinkBrowserPInvoke;
+//using static MiniBlinkPinvoke.BlinkBrowserPInvoke;
 
 namespace MiniBlinkPinvoke
 {
@@ -109,10 +108,6 @@ namespace MiniBlinkPinvoke
         wkeLoadUrlBeginCallback _wkeLoadUrlBeginCallback;
         wkeLoadUrlEndCallback _wkeLoadUrlEndCallback;
 
-        //void OnShowDevtoolsCallback(string path, IntPtr param)
-        //{
-        //    BlinkBrowserPInvoke.wkeShowDevtools(this.handle, path, _wkeOnShowDevtoolsCallback, IntPtr.Zero);
-        //}
         void OnwkeLoadUrlEndCallback(IntPtr webView, IntPtr param, string url, IntPtr job, IntPtr buf, int len)
         {
             if (OnUrlEndEvent != null)
@@ -124,6 +119,14 @@ namespace MiniBlinkPinvoke
             Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
             //Console.WriteLine(buf.Utf8IntptrToString().Length);
         }
+        /// <summary>
+        /// 这个方法里可HOOK所有资源。
+        /// </summary>
+        /// <param name="webView"></param>
+        /// <param name="param"></param>
+        /// <param name="url"></param>
+        /// <param name="job"></param>
+        /// <returns></returns>
         bool OnwkeLoadUrlBeginCallback(IntPtr webView, IntPtr param, string url, IntPtr job)
         {
             //mb://index.html/js/index.js
@@ -150,30 +153,30 @@ namespace MiniBlinkPinvoke
                             string data = strLine;
                             if (url.EndsWith(".css"))
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/css"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/css"));
                             }
                             else if (url.EndsWith(".png"))
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/png"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/png"));
                             }
                             else if (url.EndsWith(".gif"))
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/gif"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/gif"));
                             }
                             else if (url.EndsWith(".jpg"))
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/jpg"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("image/jpg"));
                             }
                             else if (url.EndsWith(".js"))
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("application/javascript"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("application/javascript"));
                             }
                             else
                             {
-                                wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
+                                BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
                             }
                             //wkeNetSetURL(job, url);
-                            wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
+                            BlinkBrowserPInvoke.wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
                         }
                         else
                         {
@@ -190,26 +193,26 @@ namespace MiniBlinkPinvoke
             else
             {
                 //如果需要 OnwkeLoadUrlEndCallback 回调，需要取消注释下面的 hook
-                wkeNetHookRequest(job);
+                BlinkBrowserPInvoke.wkeNetHookRequest(job);
             }
             return false;
         }
         private static void ResNotFond(string url, IntPtr job)
         {
             string data = "<html><head><title>404没有找到资源</title></head><body>404没有找到资源</body></html>";
-            wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
+            BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
             //wkeNetSetURL(job, url);
-            wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
+            BlinkBrowserPInvoke.wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
         }
         IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {
             if (OnCreateViewEvent != null)
             {
-                return OnCreateViewEvent(webView, param, navigationType, wkeGetString(url).Utf8IntptrToString());
+                return OnCreateViewEvent(webView, param, navigationType, BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url)));
             }
             else
             {
-                Console.WriteLine("OnwkeCreateViewCallback url:" + wkeGetString(url).Utf8IntptrToString());
+                Console.WriteLine("OnwkeCreateViewCallback url:" + BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url)));
                 Console.WriteLine("OnwkeCreateViewCallback navigationType:" + navigationType);
                 return webView;
             }
@@ -217,7 +220,7 @@ namespace MiniBlinkPinvoke
         bool OnwkeDownloadFileCallback(IntPtr webView, IntPtr param, string url)
         {
             Console.WriteLine("call OnwkeDownloadFileCallback:" + (url));
-            if (OnDownloadFile!=null)
+            if (OnDownloadFile != null)
             {
                 OnDownloadFile(url);
             }
@@ -231,24 +234,28 @@ namespace MiniBlinkPinvoke
 
             if (result == wkeLoadingResult.WKE_LOADING_FAILED)
             {
-                Console.WriteLine("call OnwkeLoadingFinishCallback 加载失败 failedReason:" + wkeGetString(failedReason).Utf8IntptrToString());
-                HTML = "<h1>" + wkeGetString(failedReason).Utf8IntptrToString() + "</h1>";
+                Console.WriteLine("call OnwkeLoadingFinishCallback 加载失败 failedReason:" + BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(failedReason)));
+                HTML = "<h1>" + BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(failedReason)) + "</h1>";
             }
             else
             {
-                this.url = wkeGetString(url).Utf8IntptrToString();
+                this.url = BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url));
                 //Console.WriteLine("call OnwkeLoadingFinishCallback:成功加载完成。" + wkeGetString(url).Utf8IntptrToString());
             }
         }
         void OnwkeDocumentReadyCallback(IntPtr webView, IntPtr param)
         {
             //Console.WriteLine("call OnwkeDocumentReadyCallback:" + Marshal.PtrToStringUni(param));//.Utf8IntptrToString());
-            DocumentReadyCallback?.Invoke();
+            //DocumentReadyCallback?.Invoke();
+            if (DocumentReadyCallback!=null)
+            {
+                DocumentReadyCallback();
+            }
         }
         void OnwkeConsoleMessageCallback(IntPtr webView, IntPtr param, wkeConsoleLevel level, IntPtr message, IntPtr sourceName, int sourceLine, IntPtr stackTrace)
         {
             //Console.WriteLine("Console level" + level);
-            Console.WriteLine("Console Msg:" + wkeGetString(message).Utf8IntptrToString());
+            Console.WriteLine("Console Msg:" + BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(message)));
             //Console.WriteLine("Console sourceName:" + wkeGetString(sourceName).Utf8IntptrToString());
             //Console.WriteLine("Console stackTrace:" + wkeGetString(stackTrace).Utf8IntptrToString());
             //Console.WriteLine("Console sourceLine:" + sourceLine);
@@ -270,35 +277,35 @@ namespace MiniBlinkPinvoke
             ContextMenuStrip = contextMenuStrip;
             ToolStripMenuItem tsmiGoBack = new ToolStripMenuItem("返回", null, (x, y) =>
             {
-                wkeGoBack(handle);
+                BlinkBrowserPInvoke.wkeGoBack(handle);
             });
             ToolStripMenuItem tsmiForward = new ToolStripMenuItem("前进", null, (x, y) =>
             {
-                wkeGoForward(handle);
+                BlinkBrowserPInvoke.wkeGoForward(handle);
             });
             ToolStripMenuItem tsmiReload = new ToolStripMenuItem("重新加载", null, (x, y) =>
             {
-                wkeReload(handle);
+                BlinkBrowserPInvoke.wkeReload(handle);
             });
             ToolStripMenuItem tsmiSelectAll = new ToolStripMenuItem("全选", null, (x, y) =>
             {
-                wkeSelectAll(handle);
+                BlinkBrowserPInvoke.wkeSelectAll(handle);
             });
             ToolStripMenuItem tsmiCopy = new ToolStripMenuItem("复制", null, (x, y) =>
             {
-                wkeCopy(handle);
+                BlinkBrowserPInvoke.wkeCopy(handle);
             });
             ToolStripMenuItem tsmiCut = new ToolStripMenuItem("剪切", null, (x, y) =>
             {
-                wkeCut(handle);
+                BlinkBrowserPInvoke.wkeCut(handle);
             });
             ToolStripMenuItem tsmiPaste = new ToolStripMenuItem("粘贴", null, (x, y) =>
             {
-                wkePaste(handle);
+                BlinkBrowserPInvoke.wkePaste(handle);
             });
             ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("删除", null, (x, y) =>
             {
-                wkeDelete(handle);
+                BlinkBrowserPInvoke.wkeDelete(handle);
             });
 
             contextMenuStrip.Items.Add(tsmiGoBack);
@@ -328,11 +335,11 @@ namespace MiniBlinkPinvoke
                 {
                     if (item.Text == "返回")
                     {
-                        item.Enabled = wkeCanGoBack(this.handle);
+                        item.Enabled = BlinkBrowserPInvoke.wkeCanGoBack(this.handle);
                     }
                     if (item.Text == "前进")
                     {
-                        item.Enabled = wkeCanGoForward(this.handle);
+                        item.Enabled = BlinkBrowserPInvoke.wkeCanGoForward(this.handle);
                     }
                     //if (item.Text == "全选")
                     //{
@@ -346,7 +353,7 @@ namespace MiniBlinkPinvoke
         {
             if (OnTitleChangeCall != null)
             {
-                OnTitleChangeCall(MiniBlinkPinvoke.BlinkBrowserPInvoke.wkeGetString(title).Utf8IntptrToString());
+                OnTitleChangeCall(BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(title)));
             }
         }
 
@@ -374,7 +381,11 @@ namespace MiniBlinkPinvoke
 
         void OnUrlChangedCallback(IntPtr webView, IntPtr param, IntPtr url)
         {
-            OnUrlChangeCall?.Invoke(wkeGetString(url).Utf8IntptrToString());
+            if (OnUrlChangeCall != null)
+            {
+                OnUrlChangeCall(BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url)));
+            }
+            //OnUrlChangeCall?.Invoke(BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url)));
             //Console.WriteLine("OnUrlChangedCallback:URL:" +);
         }
 
@@ -383,10 +394,14 @@ namespace MiniBlinkPinvoke
         {
             if (frameId.ToInt32() == 1)//主窗口才触发事件
             {
-                string nowURL = wkeGetString(url).Utf8IntptrToString();
+                string nowURL = BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url));
                 if (!regex.IsMatch(nowURL))
                 {
-                    OnUrlChange2Call?.Invoke(nowURL);
+                    if (OnUrlChange2Call!=null)
+                    {
+                        OnUrlChange2Call(nowURL);
+                    }
+                    //OnUrlChange2Call?.Invoke(nowURL);
                 }
                 else
                 {
@@ -477,7 +492,7 @@ namespace MiniBlinkPinvoke
             handle = BlinkBrowserPInvoke.wkeCreateWebView();
 
             //只有开启才会触发 wkeOnCreateView
-            wkeSetNavigationToNewWindowEnable(handle, true);
+            BlinkBrowserPInvoke.wkeSetNavigationToNewWindowEnable(handle, true);
 
             BlinkBrowserPInvoke.wkeSetHandle(this.handle, this.Handle);
             BlinkBrowserPInvoke.wkeSetHandleOffset(handle, Location.X - 2, 0);
@@ -499,7 +514,7 @@ namespace MiniBlinkPinvoke
             BindJsFunc();
             AlertBoxCallback = new AlertBoxCallback((a, b, c) =>
             {
-                MessageBox.Show(Marshal.PtrToStringUni(wkeToStringW(c)), Url + "提示");
+                MessageBox.Show(Marshal.PtrToStringUni(BlinkBrowserPInvoke.wkeToStringW(c)), Url + "提示");
             });
             BlinkBrowserPInvoke.wkeOnAlertBox(handle, AlertBoxCallback, IntPtr.Zero);
 
@@ -568,9 +583,9 @@ namespace MiniBlinkPinvoke
             #region JS 动态绑定，并返回值
             wkeJsNativeFunction jsnav = new wkeJsNativeFunction((es, param) =>
             {
-                string s = jsToString(es, jsArg(es, 0)).Utf8IntptrToString();
+                string s = BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.jsToString(es, BlinkBrowserPInvoke.jsArg(es, 0)));
                 IntPtr strPtr = Marshal.StringToCoTaskMemUni("这是C#后台返回值:" + s);
-                Int64 result = jsStringW(es, strPtr);
+                Int64 result = BlinkBrowserPInvoke.jsStringW(es, strPtr);
                 Marshal.FreeCoTaskMem(strPtr);
                 return result;
             });
@@ -582,7 +597,7 @@ namespace MiniBlinkPinvoke
             wkeJsNativeFunction jsnavGet = new wkeJsNativeFunction((es, param) =>
             {
                 Console.WriteLine("call jsBindGetter");
-                return jsStringW(es, Marshal.StringToCoTaskMemUni("{ \"name\": \"he\" }"));
+                return BlinkBrowserPInvoke.jsStringW(es, Marshal.StringToCoTaskMemUni("{ \"name\": \"he\" }"));
             });
             BlinkBrowserPInvoke.wkeJsBindGetter("testJson", jsnavGet, IntPtr.Zero);
             listObj.Add(jsnavGet);
@@ -592,12 +607,12 @@ namespace MiniBlinkPinvoke
             {
                 Console.WriteLine("call jsBindSetter");
 
-                Int64 testJson = jsArg(es, 0);
-                IntPtr argStr = jsToStringW(es, testJson);
+                Int64 testJson = BlinkBrowserPInvoke.jsArg(es, 0);
+                IntPtr argStr = BlinkBrowserPInvoke.jsToStringW(es, testJson);
                 string argString = Marshal.PtrToStringUni(argStr);
                 //MessageBox.Show(argString, "alert setter");
 
-                return jsUndefined(es);
+                return BlinkBrowserPInvoke.jsUndefined(es);
             });
             BlinkBrowserPInvoke.wkeJsBindSetter("testJson", jsnavSet, IntPtr.Zero);
             listObj.Add(jsnavSet);
@@ -623,38 +638,7 @@ namespace MiniBlinkPinvoke
             //timer.Enabled = true;
         }
 
-        //private void Timer_Tick(object sender, EventArgs e)
-        //{
-        //    Console.WriteLine(DateTime.Now + " 调用重绘");
-        //    this.Invalidate();
-        //}
-
-        private void BlinkBrowser_DragDrop(object sender, DragEventArgs e)
-        {
-            Console.WriteLine(e.Data);
-            var files = ((System.Array)e.Data.GetData(DataFormats.FileDrop));
-            IntPtr[] filesIntPtr = new IntPtr[files.Length];
-            for (int i = 0; i < files.Length; i++)
-            {
-                var xxx = BlinkBrowserPInvoke.wkeCreateStringW(Marshal.StringToCoTaskMemAuto(files.GetValue(i) as string), Encoding.UTF8.GetBytes(files.GetValue(i) as string).Length);
-                filesIntPtr[i] = xxx;
-            }
-            BlinkBrowserPInvoke.wkeSetDragFiles(handle, Location, PointToScreen(Location), filesIntPtr, files.Length);
-
-        }
-
-        private void BlinkBrowser_DragEnter(object sender, DragEventArgs e)
-        {
-            Console.WriteLine(11111);
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effect = DragDropEffects.Link;
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-            }
-        }
+   
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -688,6 +672,9 @@ namespace MiniBlinkPinvoke
             }
         }
 
+        #region 鼠标和按键
+
+      
         void SetCursors()
         {
             switch (BlinkBrowserPInvoke.wkeGetCursorInfoType(handle))
@@ -925,26 +912,33 @@ namespace MiniBlinkPinvoke
             }
             return flags;
         }
+        #endregion
 
+        /// <summary>
+        /// 执行js
+        /// </summary>
+        /// <param name="js"></param>
+        /// <returns></returns>
         public JsValue InvokeJS(string js)
         {
             IntPtr jsPtr = Marshal.StringToCoTaskMemAnsi(js);
             JsValue result = new JsValue(BlinkBrowserPInvoke.wkeRunJS(handle, jsPtr), BlinkBrowserPInvoke.wkeGlobalExec(handle));
             Marshal.FreeCoTaskMem(jsPtr);
             return result;
-            //Marshal.SecureStringToGlobalAllocAnsi(js)
-            //return new JsValue(EwePInvoke.wkeRunJS(handle, Marshal.StringToCoTaskMemAnsi(js)), EwePInvoke.wkeGlobalExec(handle));
         }
+        /// <summary>
+        /// 执行js
+        /// </summary>
+        /// <param name="js"></param>
+        /// <returns></returns>
         public JsValue InvokeJSW(string js)
         {
-            //var value = EwePInvoke.wkeRunJSW(handle, js);
             return new JsValue(BlinkBrowserPInvoke.wkeRunJSW(handle, js), BlinkBrowserPInvoke.wkeGlobalExec(handle));
-            //return Marshal.PtrToStringUni(EwePInvoke.jsToString(EwePInvoke.wkeGlobalExec(handle), xc));
-            //return new JsValue(xc, EwePInvoke.wkeGlobalExec(handle)).ToString();
-            //return Marshal.PtrToStringAnsi(xc);
         }
 
-        //private static List<jsNativeFunction> jsnaviteList = new List<jsNativeFunction>();
+        /// <summary>
+        /// 绑定带有 JSFunctin 属性的方法到前台JS，实现前后台相互调用。
+        /// </summary>
         public void BindJsFunc()
         {
             if (GlobalObjectJs == null)
@@ -995,7 +989,7 @@ namespace MiniBlinkPinvoke
                                 }
                                 else
                                 {
-                                    listParam[i] = Convert.ChangeType((BlinkBrowserPInvoke.jsToString(es, paramnow)).Utf8IntptrToString(), tType);
+                                    listParam[i] = Convert.ChangeType((BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.jsToString(es, paramnow))), tType);
                                 }
                             }
                             try
@@ -1073,17 +1067,16 @@ namespace MiniBlinkPinvoke
 
         public bool PreFilterMessage(ref Message m)
         {
-            //throw new NotImplementedException();
-            IntPtr myPtr = GetForegroundWindow();
+            IntPtr myPtr = BlinkBrowserPInvoke.GetForegroundWindow();
 
-            int length = GetWindowTextLength(myPtr);
+            int length = BlinkBrowserPInvoke.GetWindowTextLength(myPtr);
             StringBuilder windowName = new StringBuilder(length + 1);
-            GetWindowText(myPtr, windowName, windowName.Capacity);
+            BlinkBrowserPInvoke.GetWindowText(myPtr, windowName, windowName.Capacity);
             if (windowName.ToString() == "Miniblink Devtools")
             {
                 if (m.Msg == 0x0102 || m.Msg == 0x0100)
                 {
-                    SendMessage(m.HWnd, m.Msg, m.WParam, m.LParam);
+                    BlinkBrowserPInvoke.SendMessage(m.HWnd, m.Msg, m.WParam, m.LParam);
                 }
             }
             return false;
@@ -1103,12 +1096,12 @@ namespace MiniBlinkPinvoke
                     var uri = new Uri(Url);
                     var host = uri.Host;
 
-                    var allCookies = File.ReadLines(CookiePath + "\\cookies.dat").ToList();
-                    for (int i = 4; i < allCookies.Count(); i++)
+                    var allCookies = File.ReadAllLines(CookiePath + "\\cookies.dat");
+                    for (int i = 4; i < allCookies.Length; i++)
                     {
                         host = uri.Host;
                         var listCookie = allCookies[i].Split('\t');
-                        if (listCookie != null && listCookie.Count() != 0 && listCookie.Count() == 7)
+                        if (listCookie != null && listCookie.Length != 0 && listCookie.Length == 7)
                         {
                             var _cookie = listCookie[0];
 
@@ -1185,7 +1178,7 @@ namespace MiniBlinkPinvoke
         {
             get
             {
-                return BlinkBrowserPInvoke.wkeGetCookie(handle).Utf8IntptrToString();
+                return BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetCookie(handle));
             }
         }
     }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace MiniBlinkPinvoke
@@ -97,7 +94,7 @@ namespace MiniBlinkPinvoke
             {
                 return string.Empty;
             }
-            return BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0).Utf8IntptrToString();
+            return BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.jsToString(this.intptr_0, this.long_0));
         }
 
         public wkeJSType JsType

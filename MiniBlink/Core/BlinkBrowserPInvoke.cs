@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
-using System.IO;
 
 namespace MiniBlinkPinvoke
 {
@@ -618,7 +617,7 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr wkeGetVersionString();
 
 
-        public static string Utf8IntptrToString(this IntPtr ptr)
+        public static string Utf8IntptrToString(IntPtr ptr)
         {
             var data = new List<byte>();
             var off = 0;
