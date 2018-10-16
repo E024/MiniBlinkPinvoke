@@ -621,21 +621,11 @@ namespace MiniBlinkPinvoke
             BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
             listObj.Add(_wkeLoadUrlEndCallback);
 
-            //BlinkBrowserPInvoke.wkeShowDevtools()
-            //readFileCallback = new ReadFileCallback(LoadMemoryData);
-            //wkeOnReadFile(readFileCallback);
-            //listObj.Add(readFileCallback);
-
-            //文件拖放
-            //AllowDrop = true;
-            //DragEnter += BlinkBrowser_DragEnter;
-            //DragDrop += BlinkBrowser_DragDrop;
-
-
-
-            //timer.Interval = 25;
-            //timer.Tick += Timer_Tick;
-            //timer.Enabled = true;
+            //如果在设计器里赋值了，初始化后加载URL
+            if (!string.IsNullOrEmpty(url))
+            {
+                BlinkBrowserPInvoke.wkeLoadURLW(handle, url);
+            }
         }
 
    
