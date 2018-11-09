@@ -247,7 +247,7 @@ namespace MiniBlinkPinvoke
         {
             //Console.WriteLine("call OnwkeDocumentReadyCallback:" + Marshal.PtrToStringUni(param));//.Utf8IntptrToString());
             //DocumentReadyCallback?.Invoke();
-            if (DocumentReadyCallback!=null)
+            if (DocumentReadyCallback != null)
             {
                 DocumentReadyCallback();
             }
@@ -397,7 +397,7 @@ namespace MiniBlinkPinvoke
                 string nowURL = BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetString(url));
                 if (!regex.IsMatch(nowURL))
                 {
-                    if (OnUrlChange2Call!=null)
+                    if (OnUrlChange2Call != null)
                     {
                         OnUrlChange2Call(nowURL);
                     }
@@ -628,7 +628,7 @@ namespace MiniBlinkPinvoke
             }
         }
 
-   
+
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -664,7 +664,7 @@ namespace MiniBlinkPinvoke
 
         #region 鼠标和按键
 
-      
+
         void SetCursors()
         {
             switch (BlinkBrowserPInvoke.wkeGetCursorInfoType(handle))
@@ -1064,7 +1064,12 @@ namespace MiniBlinkPinvoke
             BlinkBrowserPInvoke.GetWindowText(myPtr, windowName, windowName.Capacity);
             if (windowName.ToString() == "Miniblink Devtools")
             {
-                if (m.Msg == 0x0102 || m.Msg == 0x0100)
+                int wp = m.WParam.ToInt32();
+                if (wp == 13/*回车*/ || wp == 37/*左 */ || wp == 39/*右*/ || wp == 38/*上*/ || wp == 40/*下*/)
+                {
+                    BlinkBrowserPInvoke.SendMessage(m.HWnd, m.Msg, m.WParam, m.LParam);
+                }
+                if (m.Msg == 258)//字符
                 {
                     BlinkBrowserPInvoke.SendMessage(m.HWnd, m.Msg, m.WParam, m.LParam);
                 }
@@ -1095,7 +1100,7 @@ namespace MiniBlinkPinvoke
                         {
                             var _cookie = listCookie[0];
 
-                            Lable:
+                        Lable:
                             if (_cookie == host)
                             {
                                 sbCookie.AppendFormat("{0}={1};", listCookie[5], listCookie[6]);
