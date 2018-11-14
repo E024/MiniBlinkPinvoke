@@ -133,5 +133,17 @@ namespace MiniBlinkPinvoke
         WKE_LOADING_FAILED,
         WKE_LOADING_CANCELED
     }
+    public enum wkeHttBodyElementType
+    {
+        wkeHttBodyElementTypeData,
+        wkeHttBodyElementTypeFile
+    }
+    public enum wkeRequestType
+    {
+        kWkeRequestTypeInvalidation,
+        kWkeRequestTypeGet,
+        kWkeRequestTypePost,
+        kWkeRequestTypePut,
+    }
 
 }

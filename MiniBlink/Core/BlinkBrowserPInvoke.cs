@@ -616,6 +616,16 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeGetVersionString();
 
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeNetGetPostBody(IntPtr job);
+
+        /// <summary>
+        /// wkeRequestType 
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern wkeRequestType wkeNetGetRequestMethod(IntPtr job);
 
         public static string Utf8IntptrToString(IntPtr ptr)
         {

@@ -18,50 +18,7 @@ namespace MiniBlinkPinvoke
             return new Rectangle(this.x, this.y, this.w, this.h);
         }
     }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct wkeConsoleMessage
-    {
-        public wkeMessageSource source;
-        public wkeMessageType type;
-        public wkeMessageLevel level;
-        public IntPtr message;
-        public IntPtr url;
-        public uint lineNumber;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct wkeNewViewInfo
-    {
-        public wkeNavigationType navigationType;
-        public IntPtr url;
-        public IntPtr target;
-        public int x;
-        public int y;
-        public int width;
-        public int height;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool menuBarVisible;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool statusBarVisible;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool toolBarVisible;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool locationBarVisible;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool scrollbarsVisible;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool resizable;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool fullscreen;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct wkeDocumentReadyInfo
-    {
-        public IntPtr url;
 
-        public IntPtr frameJSState;
-
-        public IntPtr mainFrameJSState;
-    }
     [StructLayout(LayoutKind.Sequential)]
     public struct wkeJSData
     {
@@ -94,4 +51,41 @@ namespace MiniBlinkPinvoke
         public wkeProxy proxy;
         public wkeSettingMask mask;
     }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct wkePostBodyElement
+    {
+        public int size;
+        public wkeHttBodyElementType type;
+        /// <summary>
+        /// 转 wkeMemBuf
+        /// </summary>
+        public IntPtr data;
+        /// <summary>
+        /// wkeString
+        /// </summary>
+        public IntPtr filePath;
+        public Int64 fileStart;
+        public Int64 fileLength;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct wkeMemBuf
+    {
+        public int size;
+        public IntPtr data;
+        public Int32 length;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct wkePostBodyElements
+    {
+        public int size;
+        /// <summary>
+        /// wkePostBodyElement**
+        /// </summary>
+        public IntPtr element;
+        public int elementSize;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool isDirty;
+    }
+
+
 }
