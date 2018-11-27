@@ -501,7 +501,7 @@ namespace MiniBlinkPinvoke
 
             //BlinkBrowserPInvoke.wkeSetTransparent(handle, true);
             BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, true);
-            CookiePath = Application.StartupPath + "\\cookie\\";
+            CookiePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cookie");
             if (!Directory.Exists(CookiePath))
             {
                 Directory.CreateDirectory(CookiePath);
