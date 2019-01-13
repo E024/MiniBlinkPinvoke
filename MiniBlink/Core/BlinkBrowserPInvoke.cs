@@ -416,6 +416,8 @@ namespace MiniBlinkPinvoke
         public static extern void wkeSetCookieJarPath(IntPtr webView, [MarshalAs(UnmanagedType.LPWStr)] [In] string path);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetCookieJarFullPath(IntPtr webView, [MarshalAs(UnmanagedType.LPWStr)] [In] string path);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetCookie(IntPtr webView, [MarshalAs(UnmanagedType.LPArray)]byte[] url, [MarshalAs(UnmanagedType.LPArray)]byte[] cookie);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Utf8StringToWkeChar([In, MarshalAs(UnmanagedType.LPStr)] string param0);
@@ -462,6 +464,18 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeEditorSelectAll(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorUnSelect(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorCopy(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorCut(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorUndo(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorRedo(IntPtr webView);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeEditorDelete(IntPtr webView);
         [return: MarshalAs(UnmanagedType.I1)]
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool wkeGoForward(IntPtr webView);
