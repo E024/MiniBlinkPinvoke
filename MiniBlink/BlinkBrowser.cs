@@ -72,7 +72,11 @@ namespace MiniBlinkPinvoke
         {
             get
             {
-                return BlinkBrowserPInvoke.wkeIsLoadingFailed(handle);
+                if (handle != IntPtr.Zero)
+                {
+                    return BlinkBrowserPInvoke.wkeIsLoadingFailed(handle);
+                }
+                return false;
             }
         }
         /// <summary>
@@ -82,14 +86,22 @@ namespace MiniBlinkPinvoke
         {
             get
             {
-                return BlinkBrowserPInvoke.wkeIsLoadingSucceeded(handle);
+                if (handle != IntPtr.Zero)
+                {
+                    return BlinkBrowserPInvoke.wkeIsLoadingSucceeded(handle);
+                }
+                return false;
             }
         }
         public bool IsLoadingCompleted
         {
             get
             {
-                return BlinkBrowserPInvoke.wkeIsLoadingCompleted(handle);
+                if (handle != IntPtr.Zero)
+                {
+                    return BlinkBrowserPInvoke.wkeIsLoadingCompleted(handle);
+                }
+                return false;
             }
         }
 
@@ -523,62 +535,45 @@ namespace MiniBlinkPinvoke
 
             _wkeNavigationCallback = OnwkeNavigationCallback;
             BlinkBrowserPInvoke.wkeOnNavigation(handle, _wkeNavigationCallback, IntPtr.Zero);
-            listObj.Add(_wkeNavigationCallback);
 
             //BlinkBrowserPInvoke.wkeSetCookieEnabled(handle, false);
 
             titleChangeCallback = OnTitleChangedCallback;
             BlinkBrowserPInvoke.wkeOnTitleChanged(this.handle, titleChangeCallback, IntPtr.Zero);
-            listObj.Add(titleChangeCallback);
 
             titleChangeCallback2 = OnTitleChangedCallback2;
             BlinkBrowserPInvoke.wkeOnMouseOverUrlChanged(this.handle, titleChangeCallback2, IntPtr.Zero);
-            listObj.Add(titleChangeCallback2);
 
             _wkeDocumentReadyCallback = OnwkeDocumentReadyCallback;
             BlinkBrowserPInvoke.wkeOnDocumentReady(this.handle, _wkeDocumentReadyCallback, IntPtr.Zero);
-            listObj.Add(_wkeDocumentReadyCallback);
 
             urlChangedCallback = OnUrlChangedCallback;
             BlinkBrowserPInvoke.wkeOnURLChanged(this.handle, urlChangedCallback, IntPtr.Zero);
-            listObj.Add(urlChangedCallback);
 
             urlChangedCallback2 = OnUrlChangedCallback2;
             BlinkBrowserPInvoke.wkeOnURLChanged2(this.handle, urlChangedCallback2, IntPtr.Zero);
-            listObj.Add(urlChangedCallback2);
 
             _wkeConsoleMessageCallback = OnwkeConsoleMessageCallback;
             BlinkBrowserPInvoke.wkeOnConsole(this.handle, _wkeConsoleMessageCallback, IntPtr.Zero);
-            listObj.Add(_wkeConsoleMessageCallback);
 
             _wkePaintUpdatedCallback = OnWkePaintUpdatedCallback;
             BlinkBrowserPInvoke.wkeOnPaintUpdated(this.handle, _wkePaintUpdatedCallback, IntPtr.Zero);
-            listObj.Add(_wkePaintUpdatedCallback);
 
             _wkeDocumentReadyCallback = OnwkeDocumentReadyCallback;
-            //var pa = Marshal.StringToCoTaskMemUni("我传的值：：：：：");
-            //BlinkBrowserPInvoke.wkeOnDocumentReady(this.handle, _wkeDocumentReadyCallback, pa);
-
-            BlinkBrowserPInvoke.wkeOnDocumentReady(this.handle, _wkeDocumentReadyCallback, IntPtr.Zero);
-            listObj.Add(_wkeDocumentReadyCallback);
-
+           
 
             _wkeLoadingFinishCallback = OnwkeLoadingFinishCallback;
             BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
-            listObj.Add(_wkeLoadingFinishCallback);
 
             //会导致 taobao 加载图片异常
             _wkeDownloadFileCallback = OnwkeDownloadFileCallback;
             BlinkBrowserPInvoke.wkeOnDownload(this.handle, _wkeDownloadFileCallback, IntPtr.Zero);
-            listObj.Add(_wkeDownloadFileCallback);
 
             _wkeCreateViewCallback = OnwkeCreateViewCallback;
             BlinkBrowserPInvoke.wkeOnCreateView(this.handle, _wkeCreateViewCallback, handle);
-            listObj.Add(_wkeCreateViewCallback);
 
             _wkeLoadUrlBeginCallback = OnwkeLoadUrlBeginCallback;
             BlinkBrowserPInvoke.wkeOnLoadUrlBegin(this.handle, _wkeLoadUrlBeginCallback, handle);
-            listObj.Add(_wkeLoadUrlBeginCallback);
 
             #region JS 动态绑定，并返回值
             wkeJsNativeFunction jsnav = new wkeJsNativeFunction((es, param) =>
@@ -590,7 +585,6 @@ namespace MiniBlinkPinvoke
                 return result;
             });
             BlinkBrowserPInvoke.wkeJsBindFunction("jsReturnValueTest", jsnav, IntPtr.Zero, 1);
-            listObj.Add(jsnav);
             #endregion
 
             // get
@@ -619,7 +613,6 @@ namespace MiniBlinkPinvoke
 
             _wkeLoadUrlEndCallback = OnwkeLoadUrlEndCallback;
             BlinkBrowserPInvoke.wkeOnLoadUrlEnd(this.handle, _wkeLoadUrlEndCallback, handle);
-            listObj.Add(_wkeLoadUrlEndCallback);
 
             //如果在设计器里赋值了，初始化后加载URL
             if (!string.IsNullOrEmpty(url))
@@ -916,6 +909,8 @@ namespace MiniBlinkPinvoke
             Marshal.FreeCoTaskMem(jsPtr);
             return result;
         }
+
+        
         /// <summary>
         /// 执行js
         /// </summary>
@@ -1034,7 +1029,7 @@ namespace MiniBlinkPinvoke
                 }
             }
         }
-        public string JsGetValue { get; set; }
+        //public string JsGetValue { get; set; }
 
         [JSFunctin]
         public void Console_WriteLine(string msg)
@@ -1173,7 +1168,14 @@ namespace MiniBlinkPinvoke
         {
             get
             {
-                return BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetCookie(handle));
+                if (handle!=IntPtr.Zero)
+                {
+                    return BlinkBrowserPInvoke.Utf8IntptrToString(BlinkBrowserPInvoke.wkeGetCookie(handle));
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
         }
     }

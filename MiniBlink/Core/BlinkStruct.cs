@@ -86,6 +86,11 @@ namespace MiniBlinkPinvoke
         [MarshalAs(UnmanagedType.I1)]
         public bool isDirty;
     }
-
+    public struct wkeScreenshotSettings
+    {
+        public int structSize;
+        public int width;
+        public int height;
+    }
 
 }
