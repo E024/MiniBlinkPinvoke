@@ -559,9 +559,6 @@ namespace MiniBlinkPinvoke
             _wkePaintUpdatedCallback = OnWkePaintUpdatedCallback;
             BlinkBrowserPInvoke.wkeOnPaintUpdated(this.handle, _wkePaintUpdatedCallback, IntPtr.Zero);
 
-            _wkeDocumentReadyCallback = OnwkeDocumentReadyCallback;
-           
-
             _wkeLoadingFinishCallback = OnwkeLoadingFinishCallback;
             BlinkBrowserPInvoke.wkeOnLoadingFinish(this.handle, _wkeLoadingFinishCallback, IntPtr.Zero);
 
