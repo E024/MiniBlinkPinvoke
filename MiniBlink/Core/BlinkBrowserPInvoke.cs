@@ -645,10 +645,10 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr wkeWebFrameGetMainFrame(IntPtr webView);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr wkePrintToBitmap(IntPtr webView,IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
+        public static extern IntPtr wkePrintToBitmap(IntPtr webView, IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeNetSetHTTPHeaderField(IntPtr jobPtr, string key, string value , [MarshalAs(UnmanagedType.I1)]bool response);
+        public static extern void wkeNetSetHTTPHeaderField(IntPtr jobPtr, [In, MarshalAs(UnmanagedType.LPWStr)]string key, [In, MarshalAs(UnmanagedType.LPWStr)]string value, [MarshalAs(UnmanagedType.I1)]bool response);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeNetGetHTTPHeaderField(IntPtr jobPtr, IntPtr key);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
