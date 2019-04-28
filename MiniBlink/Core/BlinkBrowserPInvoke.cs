@@ -647,6 +647,13 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkePrintToBitmap(IntPtr webView,IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
 
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeNetSetHTTPHeaderField(IntPtr jobPtr, string key, string value , [MarshalAs(UnmanagedType.I1)]bool response);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeNetGetHTTPHeaderField(IntPtr jobPtr, IntPtr key);
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeNetGetHTTPHeaderFieldFromResponse(IntPtr jobPtr, IntPtr key);
+
         public static string Utf8IntptrToString(IntPtr ptr)
         {
             var data = new List<byte>();
