@@ -158,11 +158,7 @@ namespace MiniBlinkPinvoke
                     {
                         if (sm != null)
                         {
-                            StreamReader m_stream = new StreamReader(sm, Encoding.Default);
-                            m_stream.BaseStream.Seek(0, SeekOrigin.Begin);
-                            string strLine = m_stream.ReadToEnd();
-                            m_stream.Close();
-                            string data = strLine;
+                            var bytes = StreamToBytes(sm);
                             if (url.EndsWith(".css"))
                             {
                                 BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/css"));
@@ -188,7 +184,7 @@ namespace MiniBlinkPinvoke
                                 BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
                             }
                             //wkeNetSetURL(job, url);
-                            BlinkBrowserPInvoke.wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
+                            BlinkBrowserPInvoke.wkeNetSetData(job, bytes, bytes.Length);
                         }
                         else
                         {
@@ -209,12 +205,29 @@ namespace MiniBlinkPinvoke
             }
             return false;
         }
+
+        byte[] StreamToBytes(Stream stream)
+
+        {
+
+            byte[] bytes = new byte[stream.Length];
+
+            stream.Read(bytes, 0, bytes.Length);
+
+            // 设置当前流的位置为流的开始 
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return bytes;
+
+        }
+
         private static void ResNotFond(string url, IntPtr job)
         {
             string data = "<html><head><title>404没有找到资源</title></head><body>404没有找到资源</body></html>";
             BlinkBrowserPInvoke.wkeNetSetMIMEType(job, Marshal.StringToCoTaskMemAnsi("text/html"));
             //wkeNetSetURL(job, url);
-            BlinkBrowserPInvoke.wkeNetSetData(job, Marshal.StringToCoTaskMemAnsi(data), Encoding.Default.GetBytes(data).Length);
+            BlinkBrowserPInvoke.wkeNetSetData(job, Encoding.Default.GetBytes(data), Encoding.Default.GetBytes(data).Length);
         }
         IntPtr OnwkeCreateViewCallback(IntPtr webView, IntPtr param, wkeNavigationType navigationType, IntPtr url)
         {

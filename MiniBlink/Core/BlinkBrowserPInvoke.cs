@@ -161,7 +161,7 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeNetSetURL(IntPtr job, [MarshalAs(UnmanagedType.LPStr)]string url);
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void wkeNetSetData(IntPtr job, IntPtr buf, int len);
+        public static extern void wkeNetSetData(IntPtr job, byte[] buf, int len);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeNetOnResponse(IntPtr webView, wkeNetResponseCallback callback, IntPtr param);
@@ -648,7 +648,7 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr wkeWebFrameGetMainFrame(IntPtr webView);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr wkePrintToBitmap(IntPtr webView, IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
+        public static extern IntPtr wkePrintToBitmap(IntPtr webView,IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
 
         public static string Utf8IntptrToString(IntPtr ptr)
         {
