@@ -199,6 +199,9 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void wkeSetDebugConfig(IntPtr handler, [MarshalAs(UnmanagedType.LPStr)] [In] string debugString, [MarshalAs(UnmanagedType.LPStr)] [In] string param);
 
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wkeSetDeviceParameter(IntPtr webview, [MarshalAs(UnmanagedType.LPStr)] [In] string device, [MarshalAs(UnmanagedType.LPStr)] [In] string paramStr, int paramInt, float paramFloat);
+
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 jsStringW(IntPtr es, IntPtr str);
@@ -645,7 +648,7 @@ namespace MiniBlinkPinvoke
         public static extern IntPtr wkeWebFrameGetMainFrame(IntPtr webView);
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr wkePrintToBitmap(IntPtr webView,IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
+        public static extern IntPtr wkePrintToBitmap(IntPtr webView, IntPtr wkeWebFrameHandle, wkeScreenshotSettings settings);
 
         public static string Utf8IntptrToString(IntPtr ptr)
         {
