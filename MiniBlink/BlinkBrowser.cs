@@ -128,8 +128,7 @@ namespace MiniBlinkPinvoke
                 Marshal.Copy(buf, managedArray, 0, len);
                 OnUrlEndEvent(managedArray, url, len);
             }
-            Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);
-            //Console.WriteLine(buf.Utf8IntptrToString().Length);
+            Console.WriteLine("call OnwkeLoadUrlEndCallback url:" + url);;
         }
         /// <summary>
         /// 这个方法里可HOOK所有资源。

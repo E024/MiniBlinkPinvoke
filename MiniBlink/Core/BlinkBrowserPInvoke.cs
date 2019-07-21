@@ -298,6 +298,21 @@ namespace MiniBlinkPinvoke
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 wkeJSGetAt(IntPtr es, Int64 @object, int @index);
 
+        #region 官方编译版本目前没有
+
+        [Obsolete("官方编译版本目前没有")]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool wkeHasSelection(IntPtr webView);
+        [Obsolete("官方编译版本目前没有")]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern string wkeGetSelectedTextW(IntPtr webView);
+        [Obsolete("官方编译版本目前没有")]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeGetSelectedText(IntPtr webView);
+        [Obsolete("官方编译版本目前没有")]
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeGetSelectedSource(IntPtr webView);
+        #endregion
 
         #region 创建JS基础变量
 
@@ -635,6 +650,11 @@ namespace MiniBlinkPinvoke
 
         [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr wkeNetGetPostBody(IntPtr job);
+
+
+
+        [DllImport(BlinkBrowserdll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr wkeNetGetHTTPHeaderFieldFromResponse(IntPtr jobPtr, [MarshalAs(UnmanagedType.LPStr)] [In] string key);
 
         /// <summary>
         /// wkeRequestType 
